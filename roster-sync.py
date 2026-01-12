@@ -1,6 +1,6 @@
-import requests
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
+from pymlb_statsapi import api
 
 PHILLIES_TEAM_ID = 143
 
@@ -14,28 +14,19 @@ def sync_phillies_40_man(db_path="ebl.db"):
     # -------------------------
     # 1. Fetch 40-man roster
     # -------------------------
-    roster_url = "https://lookup-service-prod.mlb.com/json/named.roster_40.bam"
-    roster_resp = requests.get(roster_url, params={"team_id": PHILLIES_TEAM_ID})
-    roster_resp.raise_for_status()
-
+    roster_resp = api.Team.roster(teamId=PHILLIES_TEAM_ID, rosterType="40Man")
     roster_json = roster_resp.json()
-    roster_rows = roster_json["roster_40"]["queryResults"]["row"]
-
-    if isinstance(roster_rows, dict):
-        roster_rows = [roster_rows]
+    roster_rows = roster_json.get("roster", [])
 
     # -------------------------
     # 2. Process each player
     # -------------------------
     for r in roster_rows:
-        mlb_id = int(r["player_id"])
+        mlb_id = int(r["person"]["id"])
         active_mlb_ids.add(mlb_id)
 
         # Fetch full player record
-        person_url = f"https://statsapi.mlb.com/api/v1/people/{mlb_id}"
-        person_resp = requests.get(person_url)
-        person_resp.raise_for_status()
-
+        person_resp = api.Person.person(personIds=[mlb_id])
         person = person_resp.json()["people"][0]
 
         # Parse fields
@@ -113,7 +104,7 @@ def sync_phillies_40_man(db_path="ebl.db"):
             person.get("birthCountry"),
             person.get("height"),
             int(person["weight"]) if person.get("weight") else None,
-            datetime.utcnow().isoformat(sep=" ")
+            datetime.now(timezone.utc).isoformat(sep=" ")
         ))
 
     # -------------------------
@@ -125,7 +116,7 @@ def sync_phillies_40_man(db_path="ebl.db"):
         last_updated = ?
     WHERE mlb_id NOT IN ({})
     """.format(",".join("?" * len(active_mlb_ids))),
-    (datetime.utcnow().isoformat(sep=" "), *active_mlb_ids))
+    (datetime.now(timezone.utc).isoformat(sep=" "), *active_mlb_ids))
 
     conn.commit()
     conn.close()
