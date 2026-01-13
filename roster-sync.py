@@ -4,7 +4,7 @@ from pymlb_statsapi import api
 
 PHILLIES_TEAM_ID = 143
 
-def sync_phillies_40_man(db_path="ebl.db"):
+def sync_phillies_40_man(db_path="ebl.db", roster_date=None):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -14,7 +14,13 @@ def sync_phillies_40_man(db_path="ebl.db"):
     # -------------------------
     # 1. Fetch 40-man roster
     # -------------------------
-    roster_resp = api.Team.roster(teamId=PHILLIES_TEAM_ID, rosterType="40Man")
+    roster_params = {
+        "teamId": PHILLIES_TEAM_ID,
+        "rosterType": "40Man",
+    }
+    if roster_date:
+        roster_params["date"] = roster_date
+    roster_resp = api.Team.roster(**roster_params)
     roster_json = roster_resp.json()
     roster_rows = roster_json.get("roster", [])
 
@@ -123,4 +129,17 @@ def sync_phillies_40_man(db_path="ebl.db"):
 
     print(f"Roster sync complete: {len(active_mlb_ids)} active players.")
 
-sync_phillies_40_man("ebl.db")
+if __name__ == "__main__":
+    roster_date = None
+    while True:
+        roster_input = input("Roster date (YYYY-MM-DD, blank for today): ").strip()
+        if not roster_input:
+            break
+        try:
+            datetime.strptime(roster_input, "%Y-%m-%d")
+        except ValueError:
+            print("Invalid date format. Use YYYY-MM-DD.")
+            continue
+        roster_date = roster_input
+        break
+    sync_phillies_40_man("ebl.db", roster_date=roster_date)
