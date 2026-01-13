@@ -22,6 +22,7 @@ body {
   color: var(--ink);
   background: linear-gradient(135deg, #f8f3ea 0%, #e5f1ff 45%, #fef7e0 100%);
   min-height: 100vh;
+  font-size: 20px;
 }
 
 .backdrop {
@@ -43,10 +44,15 @@ body {
 }
 
 .league-title {
-  font-size: clamp(3rem, 6vw, 5.2rem);
+  font-size: clamp(4rem, 8vw, 7rem);
   margin: 0 0 1rem;
   letter-spacing: -0.03em;
   color: var(--accent);
+}
+
+.league-title--small {
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  color: var(--ink);
 }
 
 .subhead {
@@ -94,7 +100,7 @@ body {
 
 .team-header h2 {
   margin: 0.2rem 0 0;
-  font-size: 1.5rem;
+  font-size: 2.2rem;
 }
 
 .team-meta {
@@ -112,7 +118,7 @@ body {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
   gap: 0.5rem;
-  font-size: 0.98rem;
+  font-size: 1.35rem;
   padding: 0.4rem 0.2rem;
   border-radius: 8px;
   animation: fadeIn 0.5s ease both;
@@ -121,7 +127,7 @@ body {
 
 .player-row.header {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.7rem;
+  font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--ink-soft);
@@ -162,6 +168,114 @@ body {
   }
 }
 
+.team-stats-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.team-stats-controls label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+}
+
+.team-stats-controls select {
+  background: var(--panel);
+  border: 1px solid rgba(15, 26, 44, 0.15);
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1rem;
+}
+
+.stats {
+  padding: 1rem 6vw 4rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.stats-summary {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.stats-table {
+  background: var(--panel);
+  border-radius: 20px;
+  padding: 1.4rem;
+  box-shadow: 0 18px 30px var(--shadow);
+  border: 1px solid rgba(15, 26, 44, 0.08);
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: 1.4fr 2.1fr 0.9fr 1.2fr;
+  gap: 0.6rem;
+  font-size: 1.3rem;
+  padding: 0.45rem 0.2rem;
+  border-radius: 8px;
+  animation: fadeIn 0.5s ease both;
+  animation-delay: calc(var(--i) * 25ms);
+}
+
+.stats-row span:nth-child(1),
+.stats-row span:nth-child(2) {
+  white-space: nowrap;
+}
+
+.stats-row.header {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  animation: none;
+}
+
+.stats-row:not(.header):hover {
+  background: rgba(242, 95, 92, 0.08);
+}
+
+.empty-state {
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+
+.leaderboard {
+  padding: 1rem 6vw 4rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.leaderboard-card {
+  background: var(--panel);
+  border-radius: 20px;
+  padding: 1.4rem;
+  box-shadow: 0 18px 30px var(--shadow);
+  border: 1px solid rgba(15, 26, 44, 0.08);
+}
+
+.leaderboard-card h2 {
+  margin: 0 0 1rem;
+  font-size: 2rem;
+}
+
+.leaderboard-card .stats-row {
+  grid-template-columns: 1fr 80px;
+  gap: 0.2rem;
+}
+
+.leaderboard-card .stats-row span:nth-child(2) {
+  text-align: right;
+}
+
 @media (max-width: 640px) {
   .player-row {
     grid-template-columns: 1fr;
@@ -169,6 +283,19 @@ body {
 
   .player-row span:nth-child(2) {
     display: none;
+  }
+
+  .stats-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stats-row span:nth-child(3),
+  .stats-row span:nth-child(4) {
+    display: none;
+  }
+
+  .leaderboard {
+    grid-template-columns: 1fr;
   }
 }
 

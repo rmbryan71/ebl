@@ -10,9 +10,9 @@ Statuses: not started, in progress, done, deferred.
 | REQ-002 | not started |  | Live auction for players. |
 | REQ-003 | not started |  | Scores tallied weekly. |
 | REQ-004 | done |  | Participation is free; no prize money. |
-| REQ-005 | not started |  | There are 8 teams. |
-| REQ-006 | not started |  | Each team has 4 roster spots. |
-| REQ-007 | not started |  | Pitching metric: innings pitched. |
+| REQ-005 | done |  | There are 8 teams. |
+| REQ-006 | done |  | Each team has 4 roster spots. |
+| REQ-007 | done |  | Pitching metric: innings pitched. |
 | REQ-008 | not started |  | Offense metric: total bases + walks + HBP + steals. |
 
 ## Scoring

@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 
 import requests
 
@@ -41,7 +42,16 @@ def calculate_offense(stat_line):
     )
 
 
-def populate_2025_stats(db_path="ebl.db", replace=True, game_type="R"):
+def parse_date(value, label):
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d").date()
+    except ValueError as exc:
+        raise SystemExit(f"Invalid {label} date. Use YYYY-MM-DD.") from exc
+
+
+def populate_2025_stats(db_path="ebl.db", replace=True, game_type="R", start_date=None, end_date=None):
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
         cursor = conn.cursor()
@@ -78,6 +88,11 @@ def populate_2025_stats(db_path="ebl.db", replace=True, game_type="R"):
                 date = split.get("date")
                 if not date:
                     continue
+                game_date = datetime.strptime(date, "%Y-%m-%d").date()
+                if start_date and game_date < start_date:
+                    continue
+                if end_date and game_date > end_date:
+                    continue
                 stat = split.get("stat", {})
                 offense = calculate_offense(stat)
                 entry = daily.setdefault(date, {"offense": 0, "pitching": 0})
@@ -86,6 +101,11 @@ def populate_2025_stats(db_path="ebl.db", replace=True, game_type="R"):
             for split in fetch_game_logs(mlb_id, "pitching", 2025, game_type):
                 date = split.get("date")
                 if not date:
+                    continue
+                game_date = datetime.strptime(date, "%Y-%m-%d").date()
+                if start_date and game_date < start_date:
+                    continue
+                if end_date and game_date > end_date:
                     continue
                 stat = split.get("stat", {})
                 outs = innings_to_outs(stat.get("inningsPitched"))
@@ -118,4 +138,10 @@ def populate_2025_stats(db_path="ebl.db", replace=True, game_type="R"):
 
 
 if __name__ == "__main__":
-    populate_2025_stats("ebl.db")
+    start_input = input("Start date (YYYY-MM-DD, blank for season): ").strip()
+    end_input = input("End date (YYYY-MM-DD, blank for season): ").strip()
+    start_date = parse_date(start_input, "start")
+    end_date = parse_date(end_input, "end")
+    if start_date and end_date and end_date < start_date:
+        raise SystemExit("End date must be on or after start date.")
+    populate_2025_stats("ebl.db", start_date=start_date, end_date=end_date)
