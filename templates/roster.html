@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EBL Roster</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <header class="hero">
+      <div class="hero-content">
+        <h1 class="league-title">Experimental Baseball League</h1>
+      </div>
+    </header>
+
+    <main class="roster">
+      {% for team in teams %}
+      <section class="team-card">
+        <header class="team-header">
+          <div>
+            <p class="team-label">Team</p>
+            <h2>{{ team.name }}</h2>
+          </div>
+        </header>
+        <div class="player-table">
+          <div class="player-row header">
+            <span>Player</span>
+            <span>Position</span>
+          </div>
+          {% for player in team.players %}
+          <div class="player-row" style="--i: {{ loop.index0 }}">
+            <span class="player-name">{{ player.name }}</span>
+            <span>{{ player.display_position }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endfor %}
+    </main>
+  </body>
+</html>
