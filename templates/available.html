@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EBL Available Players</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/week">Weekly Standings</a>
+      <a href="/season">Season Standings</a>
+      <a href="/available">Available Players</a>
+      <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
+    </nav>
+    <header class="hero">
+      <div class="hero-content">
+        <h1 class="league-title league-title--small">Available Players</h1>
+      </div>
+    </header>
+
+    <main class="stats">
+      <section class="stats-table">
+        <div class="stats-row header available-row">
+          <span>Player</span>
+          <span>Position</span>
+          <span>Birth date</span>
+        </div>
+        {% for row in rows %}
+        <div class="stats-row available-row" style="--i: {{ loop.index0 }}">
+          <span>
+            <a href="https://www.google.com/search?q={{ row.name | urlencode }}" target="_blank" rel="noopener">
+              {{ row.name }}
+            </a>
+          </span>
+          <span>{{ row.position_name or "-" }}</span>
+          <span>{{ row.birth_date or "-" }}</span>
+        </div>
+        {% endfor %}
+      </section>
+    </main>
+  </body>
+</html>

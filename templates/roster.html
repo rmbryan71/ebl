@@ -8,9 +8,16 @@
   </head>
   <body>
     <div class="backdrop"></div>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/week">Weekly Standings</a>
+      <a href="/season">Season Standings</a>
+      <a href="/available">Available Players</a>
+      <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
+    </nav>
     <header class="hero">
       <div class="hero-content">
-        <h1 class="league-title">Experimental Baseball League</h1>
+        <h1 class="league-title league-title--home">Experimental Baseball League</h1>
       </div>
     </header>
 
@@ -19,8 +26,9 @@
       <section class="team-card">
         <header class="team-header">
           <div>
-            <p class="team-label">Team</p>
-            <h2>{{ team.name }}</h2>
+            <h2>
+              <a href="/team?team_id={{ team.id }}">{{ team.name }}</a>
+            </h2>
           </div>
         </header>
         <div class="player-table">
@@ -30,7 +38,9 @@
           </div>
           {% for player in team.players %}
           <div class="player-row" style="--i: {{ loop.index0 }}">
-            <span class="player-name">{{ player.name }}</span>
+            <span class="player-name">
+              <a href="/player?player_id={{ player.player_id }}">{{ player.name }}</a>
+            </span>
             <span>{{ player.display_position }}</span>
           </div>
           {% endfor %}

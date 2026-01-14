@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EBL Player</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/week">Weekly Standings</a>
+      <a href="/season">Season Standings</a>
+      <a href="/available">Available Players</a>
+      <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
+    </nav>
+    <header class="hero">
+      <div class="hero-content">
+        {% if player %}
+        <h1 class="league-title league-title--small">{{ player.name }}</h1>
+        <div class="player-meta">
+          <div>
+            <span class="player-meta-label">Birthday</span>
+            <span class="player-meta-value">{{ player.birth_date or "-" }}</span>
+          </div>
+          <div>
+            <span class="player-meta-label">Position</span>
+            <span class="player-meta-value">{{ player.position_name or "-" }}</span>
+          </div>
+          <div>
+            <span class="player-meta-label">Team</span>
+            <span class="player-meta-value">
+              {% if player.team_name %}
+              <a class="player-link" href="/team?team_id={{ player.team_id }}">{{ player.team_name }}</a>
+              {% else %}
+              Unassigned
+              {% endif %}
+            </span>
+          </div>
+        </div>
+        {% else %}
+        <h1 class="league-title league-title--small">Player</h1>
+        <p class="empty-state">Provide a player_id in the query string.</p>
+        {% endif %}
+      </div>
+    </header>
+
+    <main class="stats">
+      {% if player %}
+      <section class="stats-table">
+        <div class="stats-row header">
+          <span>Date</span>
+          <span>Offense</span>
+          <span>Pitching</span>
+        </div>
+        {% for row in stats_rows %}
+        <div class="stats-row" style="--i: {{ loop.index0 }}">
+          <span>{{ row.date }}</span>
+          <span>{{ row.offense }}</span>
+          <span>{{ row.pitching }}</span>
+        </div>
+        {% endfor %}
+      </section>
+      {% else %}
+      <p class="empty-state">No player selected.</p>
+      {% endif %}
+    </main>
+  </body>
+</html>

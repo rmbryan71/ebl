@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EBL Team</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/week">Weekly Standings</a>
+      <a href="/season">Season Standings</a>
+      <a href="/available">Available Players</a>
+      <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
+    </nav>
+    <header class="hero">
+      <div class="hero-content">
+        <h2 class="team-name">{{ selected_team_name or "" }}</h2>
+      </div>
+    </header>
+
+    <main class="stats">
+      {% if teams %}
+      <section class="player-cards">
+        {% for player in player_totals %}
+        <div class="player-card">
+          <h3><a href="/player?player_id={{ player.player_id }}">{{ player.player_name }}</a></h3>
+          <div class="player-card-stats">
+            <span>Offense: {{ player.total_offense or 0 }}</span>
+            <span>Pitching: {{ player.total_pitching or 0 }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </section>
+
+      <section class="stats-table">
+        <div class="stats-row header">
+          <span>Date</span>
+          <span>Player</span>
+          <span>Offense</span>
+          <span>Pitching</span>
+        </div>
+        {% for row in rows %}
+        <div class="stats-row" style="--i: {{ loop.index0 }}">
+          <span>{{ row.date }}</span>
+          <span>
+            <a class="player-link" href="/player?player_id={{ row.player_id }}">{{ row.player_name }}</a>
+          </span>
+          <span>{{ row.offense }}</span>
+          <span>{{ row.pitching }}</span>
+        </div>
+        {% endfor %}
+      </section>
+      {% else %}
+      <p class="empty-state">No teams found. Create teams first.</p>
+      {% endif %}
+    </main>
+
+  </body>
+</html>

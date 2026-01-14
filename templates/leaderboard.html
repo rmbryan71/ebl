@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EBL Week</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/week">Weekly Standings</a>
+      <a href="/season">Season Standings</a>
+      <a href="/available">Available Players</a>
+      <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
+    </nav>
+    <header class="hero">
+      <div class="hero-content">
+        <h1 class="league-title league-title--small">Weekly Standings</h1>
+        <div class="team-stats-controls">
+          <label for="week-select">Week</label>
+          <select id="week-select">
+            {% for week_start in week_starts %}
+            <option value="{{ week_start.isoformat() }}" {% if selected_week_start == week_start %}selected{% endif %}>
+              {{ week_start.isoformat() }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <main class="leaderboard">
+      <section class="leaderboard-card">
+        <h2>Pitching</h2>
+        <div class="stats-row header">
+          <span>Team</span>
+          <span>Outs</span>
+          <span>Points</span>
+        </div>
+        {% for row in pitching_rows %}
+        <div class="stats-row" style="--i: {{ loop.index0 }}">
+          <span>
+            <a href="/team?team_id={{ row.team_id }}">{{ row.team_name }}</a>
+          </span>
+          <span>{{ row.total_pitching or 0 }}</span>
+          <span>{{ pitching_points.get(row.team_id) if pitching_points.get(row.team_id) is not none else "-" }}</span>
+        </div>
+        {% endfor %}
+      </section>
+
+      <section class="leaderboard-card">
+        <h2>Hitting</h2>
+        <div class="stats-row header">
+          <span>Team</span>
+          <span>Offense</span>
+          <span>Points</span>
+        </div>
+        {% for row in offense_rows %}
+        <div class="stats-row" style="--i: {{ loop.index0 }}">
+          <span>
+            <a href="/team?team_id={{ row.team_id }}">{{ row.team_name }}</a>
+          </span>
+          <span>{{ row.total_offense or 0 }}</span>
+          <span>{{ offense_points.get(row.team_id) if offense_points.get(row.team_id) is not none else "-" }}</span>
+        </div>
+        {% endfor %}
+      </section>
+    </main>
+
+    <script>
+      const weekSelect = document.getElementById("week-select");
+      if (weekSelect) {
+        weekSelect.addEventListener("change", () => {
+          const weekStart = weekSelect.value;
+          window.location.href = `/week?week_start=${weekStart}`;
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -25,6 +25,36 @@ body {
   font-size: 20px;
 }
 
+a {
+  color: #0a2f6b;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #082655;
+}
+
+.top-nav {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.4rem 6vw 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.top-nav a {
+  color: #0a2f6b;
+  text-decoration: underline;
+}
+
+.top-nav a:hover {
+  color: #082655;
+}
+
+
 .backdrop {
   position: fixed;
   inset: 0;
@@ -53,6 +83,15 @@ body {
 .league-title--small {
   font-size: clamp(2rem, 3.5vw, 3rem);
   color: var(--ink);
+}
+
+.league-title--home {
+  font-size: clamp(1.8rem, 2.6vw, 2.6rem);
+}
+
+.league-title--tiny {
+  font-size: clamp(1.1rem, 1.6vw, 1.6rem);
+  color: var(--ink-soft);
 }
 
 .subhead {
@@ -90,6 +129,7 @@ body {
   margin-bottom: 1rem;
 }
 
+
 .team-label {
   margin: 0;
   text-transform: uppercase;
@@ -100,7 +140,12 @@ body {
 
 .team-header h2 {
   margin: 0.2rem 0 0;
-  font-size: 2.2rem;
+  font-size: 1.4rem;
+}
+
+.team-name {
+  font-size: clamp(3rem, 6vw, 4.5rem);
+  margin: 0;
 }
 
 .team-meta {
@@ -193,10 +238,66 @@ body {
   font-size: 1rem;
 }
 
+.player-meta {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.player-meta-label {
+  display: block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+}
+
+.player-meta-value {
+  display: block;
+  font-size: 1.4rem;
+}
+
+.player-link {
+  color: #0a2f6b;
+  text-decoration: underline;
+}
+
+.player-link:hover {
+  color: #082655;
+}
+
 .stats {
   padding: 1rem 6vw 4rem;
   display: grid;
   gap: 1.5rem;
+}
+
+.player-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.player-card {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 12px 24px var(--shadow);
+  border: 1px solid rgba(15, 26, 44, 0.08);
+}
+
+.player-card h3 {
+  margin: 0 0 0.6rem;
+  font-size: 1.3rem;
+}
+
+.player-card-stats {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--ink-soft);
+  font-size: 1rem;
 }
 
 .stats-summary {
@@ -222,6 +323,24 @@ body {
   border-radius: 8px;
   animation: fadeIn 0.5s ease both;
   animation-delay: calc(var(--i) * 25ms);
+}
+
+.season-row {
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+}
+
+.season-row span:nth-child(2),
+.season-row span:nth-child(3),
+.season-row span:nth-child(4) {
+  text-align: center;
+}
+
+.available-row {
+  grid-template-columns: 1.6fr 1fr 1.2fr;
+}
+
+.total-col {
+  font-weight: 700;
 }
 
 .stats-row span:nth-child(1),
@@ -268,11 +387,15 @@ body {
 }
 
 .leaderboard-card .stats-row {
-  grid-template-columns: 1fr 80px;
-  gap: 0.2rem;
+  grid-template-columns: 1fr 150px 110px;
+  gap: 1.1rem;
 }
 
 .leaderboard-card .stats-row span:nth-child(2) {
+  text-align: right;
+}
+
+.leaderboard-card .stats-row span:nth-child(3) {
   text-align: right;
 }
 

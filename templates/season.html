@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EBL Season</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/week">Weekly Standings</a>
+      <a href="/season">Season Standings</a>
+      <a href="/available">Available Players</a>
+      <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
+    </nav>
+    <header class="hero">
+      <div class="hero-content">
+        <h1 class="league-title league-title--small">Season Standings</h1>
+      </div>
+    </header>
+
+    <main class="stats">
+      <section class="stats-table">
+        <div class="stats-row header season-row">
+          <span>Team</span>
+          <span>Offense points</span>
+          <span>Pitching points</span>
+          <span class="total-col">Total points</span>
+        </div>
+        {% for row in rows %}
+        <div class="stats-row season-row" style="--i: {{ loop.index0 }}">
+          <span>
+            <a href="/team?team_id={{ row.team_id }}">{{ row.team_name }}</a>
+          </span>
+          <span>{{ row.offense_points or 0 }}</span>
+          <span>{{ row.pitching_points or 0 }}</span>
+          <span class="total-col">{{ row.total_points or 0 }}</span>
+        </div>
+        {% endfor %}
+      </section>
+    </main>
+  </body>
+</html>
