@@ -4,3 +4,15 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
+    envVars:
+      - key: TZ
+        value: America/New_York
+
+cronjobs:
+  - name: weekly-scoring
+    schedule: "0 4 * * 0"
+    env: python
+    command: python scoring.py
+    envVars:
+      - key: TZ
+        value: America/New_York

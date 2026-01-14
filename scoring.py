@@ -65,22 +65,35 @@ def award_points_for_category(team_totals, points_map):
 def score_weeks(db_path=DB_PATH):
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM points")
-
         weekly = load_weekly_totals(conn)
         point_rows = []
         for week_start_date, team_totals in weekly.items():
             week_end_date = week_end(week_start_date)
 
-            offense_totals = {team_id: totals["offense"] for team_id, totals in team_totals.items()}
-            pitching_totals = {team_id: totals["pitching"] for team_id, totals in team_totals.items()}
+            cursor.execute(
+                "SELECT COUNT(*) FROM points WHERE date = ?",
+                (week_end_date.isoformat(),),
+            )
+            if cursor.fetchone()[0] > 0:
+                continue
 
-            for team_id, points in award_points_for_category(offense_totals, OFFENSE_POINTS):
+            offense_totals = {
+                team_id: totals["offense"] for team_id, totals in team_totals.items()
+            }
+            pitching_totals = {
+                team_id: totals["pitching"] for team_id, totals in team_totals.items()
+            }
+
+            for team_id, points in award_points_for_category(
+                offense_totals, OFFENSE_POINTS
+            ):
                 point_rows.append(
                     (team_id, week_end_date.isoformat(), points, "offense")
                 )
 
-            for team_id, points in award_points_for_category(pitching_totals, DEFENSE_POINTS):
+            for team_id, points in award_points_for_category(
+                pitching_totals, DEFENSE_POINTS
+            ):
                 point_rows.append(
                     (team_id, week_end_date.isoformat(), points, "defense")
                 )
