@@ -15,6 +15,11 @@
       <a href="/available">Available Players</a>
       <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
     </nav>
+    <nav class="bottom-nav">
+      <a href="/">Home</a>
+      <a href="/week">Week</a>
+      <a href="/season">Season</a>
+    </nav>
     <header class="hero">
       <div class="hero-content">
         <h2 class="team-name">{{ selected_team_name or "" }}</h2>
@@ -35,7 +40,7 @@
         {% endfor %}
       </section>
 
-      <section class="stats-table">
+      <section class="stats-table team-stats-table">
         <div class="stats-row header">
           <span>Date</span>
           <span>Player</span>
@@ -44,12 +49,12 @@
         </div>
         {% for row in rows %}
         <div class="stats-row" style="--i: {{ loop.index0 }}">
-          <span>{{ row.date }}</span>
-          <span>
+          <span data-label="Date">{{ row.date }}</span>
+          <span data-label="Player">
             <a class="player-link" href="/player?player_id={{ row.player_id }}">{{ row.player_name }}</a>
           </span>
-          <span>{{ row.offense }}</span>
-          <span>{{ row.pitching }}</span>
+          <span data-label="{{ 'Offense' if row.offense else '' }}">{{ row.offense if row.offense else "" }}</span>
+          <span data-label="{{ 'Pitching' if row.pitching else '' }}">{{ row.pitching if row.pitching else "" }}</span>
         </div>
         {% endfor %}
       </section>

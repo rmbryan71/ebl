@@ -91,3 +91,9 @@ Statuses: not started, in progress, done, deferred.
 | --- | --- | --- | --- |
 | REQ-056 | not started |  | Detailed, immutable audit trail for roster move attempts, stat updates, point awards, data corrections, and later logins/anonymized owner actions. |
 | REQ-057 | not started |  | Audit trail must be available to everyone at all times. |
+
+## Operational
+| ID | Status | Priority | Requirement |
+| --- | --- | --- | --- |
+| REQ-058 | not started |  | Provide a health check/status page. |
+| REQ-059 | not started |  | Improve data persistence for deployments. |

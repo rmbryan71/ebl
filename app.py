@@ -76,6 +76,7 @@ def load_team_stats(team_id=None, db_path=DB_PATH):
         FROM stats s
         JOIN players p ON p.id = s.player_id
         WHERE s.team_id = ?
+          AND (COALESCE(s.offense, 0) != 0 OR COALESCE(s.pitching, 0) != 0)
         """ + date_filter + """
         ORDER BY s.date DESC, p.name
         """,
@@ -273,6 +274,7 @@ def week_view():
         selected_week_start=selected_week_start,
         offense_points=offense_points,
         pitching_points=pitching_points,
+        timedelta=timedelta,
     )
 
 
@@ -321,6 +323,7 @@ def load_player_details(player_id, db_path=DB_PATH):
             SELECT date, offense, pitching
             FROM stats
             WHERE player_id = ? AND date LIKE ?
+              AND (COALESCE(offense, 0) != 0 OR COALESCE(pitching, 0) != 0)
             ORDER BY date DESC
             """,
             (player_id, f"{year}-%"),

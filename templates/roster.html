@@ -15,6 +15,11 @@
       <a href="/available">Available Players</a>
       <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
     </nav>
+    <nav class="bottom-nav">
+      <a href="/">Home</a>
+      <a href="/week">Week</a>
+      <a href="/season">Season</a>
+    </nav>
     <header class="hero">
       <div class="hero-content">
         <h1 class="league-title league-title--home">Experimental Baseball League</h1>
@@ -32,16 +37,12 @@
           </div>
         </header>
         <div class="player-table">
-          <div class="player-row header">
-            <span>Player</span>
-            <span>Position</span>
-          </div>
           {% for player in team.players %}
           <div class="player-row" style="--i: {{ loop.index0 }}">
             <span class="player-name">
               <a href="/player?player_id={{ player.player_id }}">{{ player.name }}</a>
             </span>
-            <span>{{ player.display_position }}</span>
+            <span class="player-position">{{ player.display_position }}</span>
           </div>
           {% endfor %}
         </div>

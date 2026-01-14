@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
 
 :root {
   --ink: #0b1a2a;
@@ -18,11 +18,11 @@
 
 body {
   margin: 0;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Poppins", sans-serif;
   color: var(--ink);
-  background: linear-gradient(135deg, #f8f3ea 0%, #e5f1ff 45%, #fef7e0 100%);
+  background: linear-gradient(160deg, #f2f2f2 0%, #d9d9d9 60%, #efefef 100%);
   min-height: 100vh;
-  font-size: 20px;
+  font-size: 17px;
 }
 
 a {
@@ -36,13 +36,14 @@ a:hover {
 
 .top-nav {
   display: flex;
-  gap: 1.5rem;
-  padding: 1.4rem 6vw 0;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 1.1rem;
+  gap: 0.8rem 1.2rem;
+  padding: 1rem 6vw 0;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.9rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
+  flex-wrap: wrap;
 }
 
 .top-nav a {
@@ -54,43 +55,71 @@ a:hover {
   color: #082655;
 }
 
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(248, 243, 234, 0.92);
+  border-top: 1px solid rgba(15, 26, 44, 0.12);
+  backdrop-filter: blur(12px);
+  padding: 0.7rem 4vw 0.9rem;
+  gap: 0.6rem;
+  justify-content: space-between;
+  z-index: 10;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.bottom-nav a {
+  flex: 1;
+  text-align: center;
+  color: #0a2f6b;
+  text-decoration: underline;
+}
+
+.bottom-nav a:hover {
+  color: #082655;
+}
+
 
 .backdrop {
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(242, 95, 92, 0.15), transparent 50%),
-    radial-gradient(circle at 80% 10%, rgba(54, 159, 255, 0.18), transparent 45%),
-    radial-gradient(circle at 60% 80%, rgba(183, 240, 212, 0.2), transparent 55%);
+  background: radial-gradient(circle at 30% 20%, rgba(0, 0, 0, 0.08), transparent 55%);
   z-index: -1;
 }
 
 .hero {
   display: grid;
   grid-template-columns: minmax(280px, 1fr);
-  gap: 2rem;
-  padding: 4rem 7vw 2rem;
+  gap: 1.2rem;
+  padding: 2.6rem 6vw 1.2rem;
   align-items: center;
 }
 
 .league-title {
-  font-size: clamp(4rem, 8vw, 7rem);
+  font-size: clamp(2.6rem, 10vw, 3.6rem);
   margin: 0 0 1rem;
   letter-spacing: -0.03em;
   color: var(--accent);
 }
 
 .league-title--small {
-  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-size: clamp(1.6rem, 6vw, 2.4rem);
   color: var(--ink);
 }
 
 .league-title--home {
-  font-size: clamp(1.8rem, 2.6vw, 2.6rem);
+  font-size: clamp(1.3rem, 5vw, 1.9rem);
 }
 
 .league-title--tiny {
-  font-size: clamp(1.1rem, 1.6vw, 1.6rem);
+  font-size: clamp(1rem, 4vw, 1.3rem);
   color: var(--ink-soft);
 }
 
@@ -106,14 +135,14 @@ a:hover {
 .roster {
   padding: 1rem 6vw 4rem;
   display: grid;
-  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1.5rem;
 }
 
 .team-card {
   background: var(--panel);
   border-radius: 20px;
-  padding: 1.5rem;
+  padding: 1.1rem;
   box-shadow: 0 18px 30px var(--shadow);
   border: 1px solid rgba(15, 26, 44, 0.08);
   animation: lift 0.6s ease both;
@@ -124,9 +153,9 @@ a:hover {
   justify-content: space-between;
   align-items: baseline;
   gap: 1rem;
-  border-bottom: 1px solid rgba(15, 26, 44, 0.08);
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0.4rem;
 }
 
 
@@ -140,7 +169,7 @@ a:hover {
 
 .team-header h2 {
   margin: 0.2rem 0 0;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
 }
 
 .team-name {
@@ -149,7 +178,7 @@ a:hover {
 }
 
 .team-meta {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Poppins", sans-serif;
   font-size: 0.75rem;
   color: var(--ink-soft);
 }
@@ -161,22 +190,13 @@ a:hover {
 
 .player-row {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1.2fr 0.8fr;
   gap: 0.5rem;
-  font-size: 1.35rem;
+  font-size: 1.05rem;
   padding: 0.4rem 0.2rem;
   border-radius: 8px;
   animation: fadeIn 0.5s ease both;
   animation-delay: calc(var(--i) * 35ms);
-}
-
-.player-row.header {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--ink-soft);
-  animation: none;
 }
 
 .player-row:not(.header):hover {
@@ -187,8 +207,14 @@ a:hover {
   font-weight: 600;
 }
 
-.player-row span:nth-child(2) {
+.player-position {
+  justify-self: end;
   white-space: nowrap;
+  color: var(--ink-soft);
+  background: rgba(11, 26, 42, 0.08);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.9em;
 }
 
 @keyframes lift {
@@ -222,7 +248,7 @@ a:hover {
 }
 
 .team-stats-controls label {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Poppins", sans-serif;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.18em;
@@ -234,7 +260,7 @@ a:hover {
   border: 1px solid rgba(15, 26, 44, 0.15);
   border-radius: 10px;
   padding: 0.5rem 0.9rem;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: 1rem;
 }
 
@@ -247,7 +273,7 @@ a:hover {
 
 .player-meta-label {
   display: block;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Poppins", sans-serif;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -276,7 +302,7 @@ a:hover {
 
 .player-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
 }
 
@@ -290,14 +316,14 @@ a:hover {
 
 .player-card h3 {
   margin: 0 0 0.6rem;
-  font-size: 1.3rem;
+  font-size: 1.1rem;
 }
 
 .player-card-stats {
   display: grid;
   gap: 0.3rem;
   color: var(--ink-soft);
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .stats-summary {
@@ -309,16 +335,17 @@ a:hover {
 .stats-table {
   background: var(--panel);
   border-radius: 20px;
-  padding: 1.4rem;
+  padding: 1rem;
   box-shadow: 0 18px 30px var(--shadow);
   border: 1px solid rgba(15, 26, 44, 0.08);
+  overflow-x: auto;
 }
 
 .stats-row {
   display: grid;
-  grid-template-columns: 1.4fr 2.1fr 0.9fr 1.2fr;
+  grid-template-columns: 1.2fr 1.2fr 0.9fr 0.9fr;
   gap: 0.6rem;
-  font-size: 1.3rem;
+  font-size: 1.05rem;
   padding: 0.45rem 0.2rem;
   border-radius: 8px;
   animation: fadeIn 0.5s ease both;
@@ -326,13 +353,11 @@ a:hover {
 }
 
 .season-row {
-  grid-template-columns: 1.6fr 1fr 1fr 1fr;
+  grid-template-columns: 1.6fr 0.4fr;
 }
 
-.season-row span:nth-child(2),
-.season-row span:nth-child(3),
-.season-row span:nth-child(4) {
-  text-align: center;
+.season-row span:nth-child(2) {
+  text-align: right;
 }
 
 .available-row {
@@ -343,14 +368,43 @@ a:hover {
   font-weight: 700;
 }
 
-.stats-row span:nth-child(1),
-.stats-row span:nth-child(2) {
-  white-space: nowrap;
+.season-cards {
+  display: none;
+  gap: 1rem;
+}
+
+.season-card {
+  background: var(--panel);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 12px 24px var(--shadow);
+  border: 1px solid rgba(15, 26, 44, 0.08);
+}
+
+.season-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.8rem;
+}
+
+.season-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+}
+
+.season-rank {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
 }
 
 .stats-row.header {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 1rem;
+  font-family: "Poppins", sans-serif;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--ink-soft);
@@ -361,6 +415,14 @@ a:hover {
   background: rgba(242, 95, 92, 0.08);
 }
 
+.team-stats-table .stats-row {
+  border-bottom: 1px solid rgba(15, 26, 44, 0.12);
+}
+
+.team-stats-table .stats-row:last-child {
+  border-bottom: none;
+}
+
 .empty-state {
   font-size: 1rem;
   color: var(--ink-soft);
@@ -369,26 +431,26 @@ a:hover {
 .leaderboard {
   padding: 1rem 6vw 4rem;
   display: grid;
-  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  grid-template-columns: 1fr;
   gap: 1.5rem;
 }
 
 .leaderboard-card {
   background: var(--panel);
   border-radius: 20px;
-  padding: 1.4rem;
+  padding: 1.1rem;
   box-shadow: 0 18px 30px var(--shadow);
   border: 1px solid rgba(15, 26, 44, 0.08);
 }
 
 .leaderboard-card h2 {
   margin: 0 0 1rem;
-  font-size: 2rem;
+  font-size: 1.6rem;
 }
 
 .leaderboard-card .stats-row {
-  grid-template-columns: 1fr 150px 110px;
-  gap: 1.1rem;
+  grid-template-columns: 1fr 90px 70px;
+  gap: 0.6rem;
 }
 
 .leaderboard-card .stats-row span:nth-child(2) {
@@ -399,37 +461,189 @@ a:hover {
   text-align: right;
 }
 
-@media (max-width: 640px) {
-  .player-row {
-    grid-template-columns: 1fr;
+@media (max-width: 699px) {
+  .league-title--home {
+    margin-bottom: 0.2rem;
   }
 
-  .player-row span:nth-child(2) {
+  .hero {
+    padding: 1.6rem 6vw 0.6rem;
+  }
+
+  .top-nav {
+    display: none;
+  }
+
+  .bottom-nav {
+    display: flex;
+  }
+
+  main {
+    padding-bottom: 4.5rem;
+  }
+
+  .stats-row.header {
     display: none;
   }
 
   .stats-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
   }
 
-  .stats-row span:nth-child(3),
-  .stats-row span:nth-child(4) {
+  .stats-row span {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .stats-row span::before {
+    content: attr(data-label);
+    font-family: "Poppins", sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+  }
+
+  .stats-row span:nth-child(1),
+  .stats-row span:nth-child(2) {
+    white-space: normal;
+  }
+
+  .weekly-row {
+    grid-template-columns: 1fr 0.8fr 0.8fr;
+    gap: 0.6rem;
+  }
+
+  .weekly-row.header {
+    display: grid;
+  }
+
+  .weekly-row span {
+    display: block;
+  }
+
+  .weekly-row span::before {
+    content: none;
+  }
+
+  .season-table {
     display: none;
   }
 
-  .leaderboard {
-    grid-template-columns: 1fr;
+  .season-cards {
+    display: grid;
   }
 }
 
-@media (max-width: 1200px) {
+@media (min-width: 700px) {
+  body {
+    font-size: 18px;
+  }
+
+  .top-nav {
+    font-size: 1rem;
+    padding: 1.2rem 6vw 0;
+  }
+
+  .hero {
+    padding: 3.2rem 7vw 1.6rem;
+    gap: 1.6rem;
+  }
+
+  .league-title {
+    font-size: clamp(3.2rem, 6vw, 4.6rem);
+  }
+
+  .league-title--home {
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+  }
+
   .roster {
     grid-template-columns: repeat(2, minmax(240px, 1fr));
   }
+
+  .team-card {
+    padding: 1.4rem;
+  }
+
+  .stats-table {
+    padding: 1.4rem;
+  }
+
+  .leaderboard-card {
+    padding: 1.4rem;
+  }
+
+  .team-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .player-row {
+    font-size: 1.2rem;
+  }
+
+  .player-row.header {
+    font-size: 0.95rem;
+  }
+
+  .stats-row {
+    font-size: 1.15rem;
+  }
+
+  .stats-row.header {
+    font-size: 0.95rem;
+  }
+
+  .player-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .player-card-stats {
+    font-size: 1rem;
+  }
 }
 
-@media (max-width: 800px) {
+@media (min-width: 900px) {
+  .stats-row {
+    grid-template-columns: 1.4fr 2fr 1fr 1fr;
+  }
+
+  .stats-row span:nth-child(1),
+  .stats-row span:nth-child(2) {
+    white-space: nowrap;
+  }
+
+  .leaderboard {
+    grid-template-columns: repeat(2, minmax(240px, 1fr));
+  }
+
+  .leaderboard-card h2 {
+    font-size: 1.8rem;
+  }
+
+  .leaderboard-card .stats-row {
+    grid-template-columns: 1fr 120px 90px;
+    gap: 0.9rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  body {
+    font-size: 20px;
+  }
+
+  .league-title {
+    font-size: clamp(4rem, 7vw, 6.4rem);
+  }
+
   .roster {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+  }
+
+  .leaderboard-card .stats-row {
+    grid-template-columns: 1fr 150px 110px;
+    gap: 1.1rem;
   }
 }

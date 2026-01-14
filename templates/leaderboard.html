@@ -15,6 +15,11 @@
       <a href="/available">Available Players</a>
       <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
     </nav>
+    <nav class="bottom-nav">
+      <a href="/">Home</a>
+      <a href="/week">Week</a>
+      <a href="/season">Season</a>
+    </nav>
     <header class="hero">
       <div class="hero-content">
         <h1 class="league-title league-title--small">Weekly Standings</h1>
@@ -22,8 +27,9 @@
           <label for="week-select">Week</label>
           <select id="week-select">
             {% for week_start in week_starts %}
+            {% set week_end = week_start + timedelta(days=6) %}
             <option value="{{ week_start.isoformat() }}" {% if selected_week_start == week_start %}selected{% endif %}>
-              {{ week_start.isoformat() }}
+              {{ week_start.isoformat() }} to {{ week_end.isoformat() }}
             </option>
             {% endfor %}
           </select>
@@ -34,13 +40,13 @@
     <main class="leaderboard">
       <section class="leaderboard-card">
         <h2>Pitching</h2>
-        <div class="stats-row header">
+        <div class="stats-row header weekly-row">
           <span>Team</span>
           <span>Outs</span>
           <span>Points</span>
         </div>
         {% for row in pitching_rows %}
-        <div class="stats-row" style="--i: {{ loop.index0 }}">
+        <div class="stats-row weekly-row" style="--i: {{ loop.index0 }}">
           <span>
             <a href="/team?team_id={{ row.team_id }}">{{ row.team_name }}</a>
           </span>
@@ -52,13 +58,13 @@
 
       <section class="leaderboard-card">
         <h2>Hitting</h2>
-        <div class="stats-row header">
+        <div class="stats-row header weekly-row">
           <span>Team</span>
           <span>Offense</span>
           <span>Points</span>
         </div>
         {% for row in offense_rows %}
-        <div class="stats-row" style="--i: {{ loop.index0 }}">
+        <div class="stats-row weekly-row" style="--i: {{ loop.index0 }}">
           <span>
             <a href="/team?team_id={{ row.team_id }}">{{ row.team_name }}</a>
           </span>

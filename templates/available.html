@@ -15,6 +15,11 @@
       <a href="/available">Available Players</a>
       <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
     </nav>
+    <nav class="bottom-nav">
+      <a href="/">Home</a>
+      <a href="/week">Week</a>
+      <a href="/season">Season</a>
+    </nav>
     <header class="hero">
       <div class="hero-content">
         <h1 class="league-title league-title--small">Available Players</h1>
@@ -30,13 +35,13 @@
         </div>
         {% for row in rows %}
         <div class="stats-row available-row" style="--i: {{ loop.index0 }}">
-          <span>
+          <span data-label="Player">
             <a href="https://www.google.com/search?q={{ row.name | urlencode }}" target="_blank" rel="noopener">
               {{ row.name }}
             </a>
           </span>
-          <span>{{ row.position_name or "-" }}</span>
-          <span>{{ row.birth_date or "-" }}</span>
+          <span data-label="Position">{{ row.position_name or "-" }}</span>
+          <span data-label="Birth date">{{ row.birth_date or "-" }}</span>
         </div>
         {% endfor %}
       </section>

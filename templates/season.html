@@ -15,6 +15,11 @@
       <a href="/available">Available Players</a>
       <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
     </nav>
+    <nav class="bottom-nav">
+      <a href="/">Home</a>
+      <a href="/week">Week</a>
+      <a href="/season">Season</a>
+    </nav>
     <header class="hero">
       <div class="hero-content">
         <h1 class="league-title league-title--small">Season Standings</h1>
@@ -22,21 +27,25 @@
     </header>
 
     <main class="stats">
-      <section class="stats-table">
-        <div class="stats-row header season-row">
-          <span>Team</span>
-          <span>Offense points</span>
-          <span>Pitching points</span>
-          <span class="total-col">Total points</span>
-        </div>
+      <section class="stats-table season-table">
         {% for row in rows %}
         <div class="stats-row season-row" style="--i: {{ loop.index0 }}">
           <span>
             <a href="/team?team_id={{ row.team_id }}">{{ row.team_name }}</a>
           </span>
-          <span>{{ row.offense_points or 0 }}</span>
-          <span>{{ row.pitching_points or 0 }}</span>
           <span class="total-col">{{ row.total_points or 0 }}</span>
+        </div>
+        {% endfor %}
+      </section>
+
+      <section class="season-cards">
+        {% for row in rows %}
+        <div class="season-card">
+          <div class="season-card-header">
+            <h3><a href="/team?team_id={{ row.team_id }}">{{ row.team_name }}</a></h3>
+            <p class="season-rank">#{{ loop.index }}</p>
+          </div>
+          <p class="total-col">Total points: {{ row.total_points or 0 }}</p>
         </div>
         {% endfor %}
       </section>

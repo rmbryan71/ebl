@@ -15,6 +15,11 @@
       <a href="/available">Available Players</a>
       <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
     </nav>
+    <nav class="bottom-nav">
+      <a href="/">Home</a>
+      <a href="/week">Week</a>
+      <a href="/season">Season</a>
+    </nav>
     <header class="hero">
       <div class="hero-content">
         {% if player %}
@@ -56,9 +61,9 @@
         </div>
         {% for row in stats_rows %}
         <div class="stats-row" style="--i: {{ loop.index0 }}">
-          <span>{{ row.date }}</span>
-          <span>{{ row.offense }}</span>
-          <span>{{ row.pitching }}</span>
+          <span data-label="Date">{{ row.date }}</span>
+          <span data-label="Offense">{{ row.offense }}</span>
+          <span data-label="Pitching">{{ row.pitching }}</span>
         </div>
         {% endfor %}
       </section>
