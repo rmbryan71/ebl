@@ -27,10 +27,16 @@ def load_weekly_totals(conn):
     )
     weekly = {}
     for row in cursor.fetchall():
-        try:
-            game_date = datetime.strptime(row["date"], "%Y-%m-%d").date()
-        except ValueError:
-            continue
+        value = row["date"]
+        if isinstance(value, datetime):
+            game_date = value.date()
+        elif hasattr(value, "isoformat") and not isinstance(value, str):
+            game_date = value
+        else:
+            try:
+                game_date = datetime.strptime(value, "%Y-%m-%d").date()
+            except (TypeError, ValueError):
+                continue
         start = week_start(game_date)
         totals = weekly.setdefault(start, {})
         team_totals = totals.setdefault(

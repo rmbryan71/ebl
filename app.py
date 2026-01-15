@@ -164,9 +164,16 @@ def load_leaderboard(week_start=None, db_path=DB_PATH):
     cursor.execute("SELECT DISTINCT date FROM stats ORDER BY date DESC")
     dates = []
     for row in cursor.fetchall():
+        value = row["date"]
+        if isinstance(value, datetime):
+            dates.append(value.date())
+            continue
+        if isinstance(value, date):
+            dates.append(value)
+            continue
         try:
-            dates.append(datetime.strptime(row["date"], "%Y-%m-%d").date())
-        except ValueError:
+            dates.append(datetime.strptime(value, "%Y-%m-%d").date())
+        except (TypeError, ValueError):
             continue
     week_starts = sorted({date - timedelta(days=date.weekday()) for date in dates}, reverse=True)
 
@@ -311,10 +318,16 @@ def load_player_details(player_id, db_path=DB_PATH):
     first_row = cursor.fetchone()
     year = None
     if first_row and first_row["first_date"]:
-        try:
-            year = datetime.strptime(first_row["first_date"], "%Y-%m-%d").year
-        except ValueError:
-            year = None
+        value = first_row["first_date"]
+        if isinstance(value, datetime):
+            year = value.year
+        elif isinstance(value, date):
+            year = value.year
+        else:
+            try:
+                year = datetime.strptime(value, "%Y-%m-%d").year
+            except (TypeError, ValueError):
+                year = None
 
     stats_rows = []
     if year:
