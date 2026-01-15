@@ -341,6 +341,66 @@ a:hover {
   overflow-x: auto;
 }
 
+.rules-hero {
+  padding-bottom: 0.4rem;
+}
+
+.rules-intro {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--ink-soft);
+}
+
+.rules-page {
+  padding: 1rem 6vw 4rem;
+  display: grid;
+  gap: 1.4rem;
+}
+
+.rules-card {
+  background: var(--panel);
+  border-radius: 20px;
+  padding: 1.4rem 1.6rem;
+  box-shadow: 0 18px 30px var(--shadow);
+  border: 1px solid rgba(15, 26, 44, 0.08);
+}
+
+.rules-card h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.4rem;
+  color: var(--ink);
+}
+
+.rules-list {
+  margin: 0;
+  padding-left: 1.4rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.rules-list li {
+  margin: 0.4rem 0;
+}
+
+.rules-changelog {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.rules-changelog-entry {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.rules-changelog-title {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+
+
 .stats-row {
   display: grid;
   grid-template-columns: 1.2fr 1.2fr 0.9fr 0.9fr;
@@ -500,6 +560,10 @@ a:hover {
   }
 
   .top-nav {
+    display: none;
+  }
+
+  .top-nav .nav-rules {
     display: none;
   }
 

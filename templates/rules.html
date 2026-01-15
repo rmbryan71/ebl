@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EBL Rules</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/week">Weekly Standings</a>
+      <a href="/season">Season Standings</a>
+      <a href="/available">Available Players</a>
+      <a href="/audit">Audit</a>
+      <a href="/rules" class="nav-rules">Rules</a>
+    </nav>
+    <nav class="bottom-nav">
+      <a href="/">Home</a>
+      <a href="/week">Week</a>
+      <a href="/season">Season</a>
+    </nav>
+    <header class="hero rules-hero">
+      <div class="hero-content">
+        <h1 class="league-title league-title--small">Rules</h1>
+      </div>
+    </header>
+
+    <main class="rules-page">
+      {% for section in sections %}
+      <section class="rules-card">
+        <h2>{{ section.title }}</h2>
+        <ol class="rules-list">
+          {% for item in section["items"] %}
+          <li>{{ item }}</li>
+          {% endfor %}
+        </ol>
+      </section>
+      {% endfor %}
+
+      <section class="rules-card">
+        <h2>Change log</h2>
+        <div class="rules-changelog">
+          {% for entry in changelog %}
+          <div class="rules-changelog-entry">
+            <div class="rules-changelog-title">
+              <span>{{ entry.date }}</span>
+              <span>v {{ entry.version }}</span>
+            </div>
+            <ul class="rules-list">
+              {% for item in entry["items"] %}
+              <li>{{ item }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

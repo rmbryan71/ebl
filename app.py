@@ -16,6 +16,163 @@ RATE_LIMITS = {
 REQUEST_HISTORY = defaultdict(deque)
 ENFORCE_HTTPS = os.getenv("FORCE_HTTPS", "").lower() in {"1", "true", "yes"}
 
+RULES_CHANGELOG = [
+    {
+        "date": "January 13, 2026",
+        "version": "1.00",
+        "items": [
+            "Removes the comms plan, tech plan, roadmap, and lists.",
+            "Removes the privacy and audit trail requirements.",
+            "Fixes pitching scoring to outs, not innings pitched.",
+            "Clarifies scoring for ties of zero stats.",
+            "Simplifies the wording for scoring.",
+            "Adds link to the live prototype.",
+        ],
+    },
+    {
+        "date": "January 10, 2026",
+        "version": "0.04",
+        "items": [
+            "Overhauls wording throughout.",
+            "Updates formatting for readability.",
+            "Adds 40-man roster requirement.",
+        ],
+    },
+    {
+        "date": "January 9, 2026",
+        "version": "0.04",
+        "items": [
+            "Overhaul, move to web.",
+            "Removes implementation section to tech plan.",
+            "Removes irrelevant conversational tangents.",
+            "Removes communications plan to comms plan.",
+        ],
+    },
+    {
+        "date": "January 8, 2026",
+        "version": "0.03",
+        "items": [
+            "Overhauls the auction.",
+            "Removes unhelpful strategy note from roster section.",
+            "Adds special case to roster move processing order.",
+            "Clarifies how empty roster spots can happen.",
+            "Specifies lack of remedy for injuries or suspensions.",
+        ],
+    },
+    {
+        "date": "January 7, 2026",
+        "version": "0.02",
+        "items": [
+            "Adds stolen bases to offense.",
+            "Changes auction order to nominations.",
+            "Specifies whole dollar amounts for bids.",
+            "Overhauls ties.",
+            "Adds missing headings.",
+            "Adds future features section.",
+            "Changes roster moves from daily to weekly.",
+            "Specifies that ties during roster moves are handled randomly.",
+            "Adds note about documentation to implementation section.",
+            "Adds privacy requirement to implementation section.",
+            "Adds audit trail requirement to implementation section.",
+            "Adds communication plan to implementation section.",
+        ],
+    },
+    {
+        "date": "January 6, 2026",
+        "version": "0.01",
+        "items": ["Initial release."],
+    },
+]
+
+RULES_SECTIONS = [
+    {
+        "title": "Introduction",
+        "items": [
+            "Phillies players only.",
+            "A live auction for players.",
+            "Scores tallied weekly.",
+        ],
+    },
+    {
+        "title": "General Rules",
+        "items": [
+            "Participation is free, and there is no prize money.",
+            "There are 8 teams in our league.",
+            "Each team has 4 roster spots.",
+            "Pitching is measured by Outs.",
+            "Offense is measured by the sum of Total Bases + Walks + HBP + Steals.",
+        ],
+    },
+    {
+        "title": "Scoring",
+        "items": [
+            "Each week, teams earn points in pitching and offense: 1st place gets 10 points, 2nd gets 8, and 3rd gets 4.",
+            "Partial weeks at the beginning of the year, the all-star break, and the end of the year all get the same points awarded as full weeks.",
+            "If a pitcher gets on base, that counts as offense.",
+            "If a hitter gets pitching outs, those count.",
+        ],
+    },
+    {
+        "title": "Ties",
+        "items": [
+            "All teams tied for a position get all the points for that spot as if there were no tie.",
+            "No points are awarded for second place if two teams tie for first place.",
+            "No points are awarded for third place if two or more teams tie for second place.",
+            "If there is a three-way tie for first place, all three teams get first place points, and there are no other points awarded.",
+            "If there is a six-way tie for third, all six teams get third place points.",
+            "If only one team records any offense/pitching in a week, they get 10 points. Nobody else gets any points. No points are awarded for second or third place if everyone ties at zero.",
+        ],
+    },
+    {
+        "title": "Rosters",
+        "items": [
+            "Only players on the Phillies 40-man roster can be on teams in our league.",
+            "If a player on your team gets traded away from the Phillies, retires, dies, gets picked up by another team on waivers, or leaves the organization for any reason, you have an empty roster spot to fill.",
+            "There is specifically no remedy for suspensions or injuries. Those do not create empty roster spots.",
+            "You do not have to fill empty roster spots immediately, or ever.",
+            "Only major league production counts.",
+            "If you have a player that gets sent down or called up, you do not have to do anything.",
+            "If you want all pitchers, all hitters, or any mix of hitters and pitchers, that is fine.",
+        ],
+    },
+    {
+        "title": "Roster Moves",
+        "items": [
+            "You can make a maximum of 1 roster move attempt per week.",
+            "Even if you have more than one open roster spot, you only get one roster move attempt per week.",
+            "Roster moves happen Sunday night after points are awarded.",
+            "Your roster move attempt includes the name of the player you want to drop and the name of the player you want to add.",
+            "You cannot submit a roster move for a player on another team in our league in the hope that the player gets dropped before your turn in the roster move process.",
+            "Teams with empty roster spots go first in the roster move process. If more than one team has an empty roster spot, the lower-ranking teams go first.",
+            "Aside from teams with empty roster spots, roster move attempts are processed in reverse order of the current league standings. In the case of ties in the league standings, roster move attempts will happen between the tied franchises randomly.",
+            "If the player you attempt to add is not available when it comes to your turn in the roster moves process, nothing happens. You do not lose the player you tried to drop. You can try again next week.",
+            "When the Phillies add a player, they become available at the end of week they are acquired.",
+            "If there is a tie in the standings and two teams try to acquire the same player, the player is assigned randomly.",
+            "There is no trading players between teams.",
+        ],
+    },
+    {
+        "title": "The Auction",
+        "items": [
+            "This will be a Zoom call at 6:00 PM on Sunday, March 22, 2026.",
+            "Every team gets $100 to field their team.",
+            "All bids are whole-dollar values, no pennies.",
+            "You must fill all 4 roster spots on your team during the auction.",
+            "Owners will nominate players to be auctioned.",
+            "When you nominate a player, you automatically start the bidding for that player at $1.",
+            "You must save enough money to be able to fill all your roster spots. You cannot spend all your money without filling all of your roster spots.",
+            "When it is your turn to nominate, you just say what player you want to come up for auction next.",
+            "Owners will nominate in a random order that is not decided until the auction starts.",
+            "At the end of each player auction, we will know which team in our league that player is on and how much the owner paid for them.",
+            "If you have extra money left over at the end of the auction, that is fine, it was not really money anyway.",
+            "We will have exactly 32 auctions.",
+            "If an auction starts with two owners simultaneously bidding $97 for a player, the older owner gets the player.",
+            "Otherwise, it is an open auction, so owners just shout out how much they are willing to pay and that is the going price.",
+            "Ownership of players is for the 2026 season only.",
+        ],
+    },
+]
+
 
 def get_client_ip():
     forwarded_for = request.headers.get("X-Forwarded-For", "")
@@ -519,6 +676,15 @@ def audit_view():
         rows=rows,
         page=page,
         total_pages=total_pages,
+    )
+
+
+@app.route("/rules")
+def rules_view():
+    return render_template(
+        "rules.html",
+        changelog=RULES_CHANGELOG,
+        sections=RULES_SECTIONS,
     )
 
 
