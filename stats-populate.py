@@ -1,8 +1,8 @@
-import sqlite3
 from datetime import datetime
 
 import requests
 
+from db import get_connection, param_placeholder, using_postgres
 def fetch_game_logs(person_id, group, season, game_type="R"):
     url = f"https://statsapi.mlb.com/api/v1/people/{person_id}/stats"
     params = {
@@ -52,27 +52,45 @@ def parse_date(value, label):
 
 
 def populate_2025_stats(db_path="ebl.db", replace=True, game_type="R", start_date=None, end_date=None):
-    with sqlite3.connect(db_path) as conn:
-        conn.row_factory = sqlite3.Row
+    with get_connection(db_path) as conn:
         cursor = conn.cursor()
+        ph = param_placeholder()
 
         cursor.execute("SELECT id FROM teams ORDER BY id")
-        team_ids = [row[0] for row in cursor.fetchall()]
+        team_ids = [row["id"] for row in cursor.fetchall()]
         if not team_ids:
             raise SystemExit("No teams found in ebl.db. Create teams before populating stats.")
 
         cursor.execute("SELECT player_id, team_id FROM team_player")
-        team_map = {row[0]: row[1] for row in cursor.fetchall()}
+        team_map = {row["player_id"]: row["team_id"] for row in cursor.fetchall()}
 
         cursor.execute("SELECT id, mlb_id FROM players WHERE is_active = 1 ORDER BY id")
         players = cursor.fetchall()
 
         if replace and players:
             player_ids = [str(row["id"]) for row in players]
+            placeholders = ",".join([ph] * len(player_ids))
+            params = []
+            if start_date or end_date:
+                if start_date and end_date:
+                    date_clause = f"date BETWEEN {ph} AND {ph}"
+                    params.extend([start_date.isoformat(), end_date.isoformat()])
+                elif start_date:
+                    date_clause = f"date >= {ph}"
+                    params.append(start_date.isoformat())
+                else:
+                    date_clause = f"date <= {ph}"
+                    params.append(end_date.isoformat())
+            else:
+                if using_postgres():
+                    date_clause = "CAST(date AS TEXT) LIKE '2025-%'"
+                else:
+                    date_clause = "date LIKE '2025-%'"
+            params.extend(player_ids)
             cursor.execute(
-                "DELETE FROM stats WHERE date LIKE '2025-%' "
-                f"AND player_id IN ({','.join(['?'] * len(player_ids))})",
-                player_ids,
+                f"DELETE FROM stats WHERE {date_clause} "
+                f"AND player_id IN ({placeholders})",
+                params,
             )
 
         rows = []
@@ -125,9 +143,9 @@ def populate_2025_stats(db_path="ebl.db", replace=True, game_type="R", start_dat
 
         if rows:
             cursor.executemany(
-                """
+                f"""
                 INSERT INTO stats (player_id, team_id, date, offense, pitching)
-                VALUES (?, ?, ?, ?, ?)
+                VALUES ({ph}, {ph}, {ph}, {ph}, {ph})
                 """,
                 rows,
             )

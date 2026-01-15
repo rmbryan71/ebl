@@ -1,8 +1,9 @@
 from collections import defaultdict
 from datetime import date, datetime, timedelta
-import sqlite3
 
 from flask import Flask, render_template, request
+
+from db import get_connection, param_placeholder
 
 
 DB_PATH = "ebl.db"
@@ -11,8 +12,7 @@ app = Flask(__name__)
 
 
 def load_roster(db_path=DB_PATH):
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
+    conn = get_connection(db_path)
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -52,9 +52,9 @@ def load_roster(db_path=DB_PATH):
 
 
 def load_team_stats(team_id=None, db_path=DB_PATH):
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
+    conn = get_connection(db_path)
     cursor = conn.cursor()
+    ph = param_placeholder()
 
     cursor.execute("SELECT id, name FROM teams ORDER BY name")
     teams = cursor.fetchall()
@@ -75,11 +75,11 @@ def load_team_stats(team_id=None, db_path=DB_PATH):
             p.name AS player_name
         FROM stats s
         JOIN players p ON p.id = s.player_id
-        WHERE s.team_id = ?
+        WHERE s.team_id = {ph}
           AND (COALESCE(s.offense, 0) != 0 OR COALESCE(s.pitching, 0) != 0)
         """ + date_filter + """
         ORDER BY s.date DESC, p.name
-        """,
+        """.format(ph=ph),
         params,
     )
     rows = cursor.fetchall()
@@ -95,10 +95,10 @@ def load_team_stats(team_id=None, db_path=DB_PATH):
         JOIN players p ON p.id = tp.player_id
         LEFT JOIN stats s
             ON s.player_id = p.id AND s.team_id = tp.team_id
-        WHERE tp.team_id = ?
+        WHERE tp.team_id = {ph}
         GROUP BY p.id
         ORDER BY p.name
-        """,
+        """.format(ph=ph),
         (selected_team_id,),
     )
     player_totals = cursor.fetchall()
@@ -111,7 +111,7 @@ def load_team_stats(team_id=None, db_path=DB_PATH):
             SUM(offense) AS total_offense,
             SUM(pitching) AS total_pitching
         FROM stats
-        WHERE team_id = ?
+        WHERE team_id = {ph}
         {totals_filter}
         """,
         totals_params,
@@ -157,9 +157,9 @@ def team_stats():
 
 
 def load_leaderboard(week_start=None, db_path=DB_PATH):
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
+    conn = get_connection(db_path)
     cursor = conn.cursor()
+    ph = param_placeholder()
 
     cursor.execute("SELECT DISTINCT date FROM stats ORDER BY date DESC")
     dates = []
@@ -186,7 +186,7 @@ def load_leaderboard(week_start=None, db_path=DB_PATH):
     selected_week_end = None
     if selected_week_start:
         selected_week_end = selected_week_start + timedelta(days=6)
-        date_filter = "WHERE s.date BETWEEN ? AND ?"
+        date_filter = f"WHERE s.date BETWEEN {ph} AND {ph}"
         params.extend([selected_week_start.isoformat(), selected_week_end.isoformat()])
 
     cursor.execute(
@@ -225,20 +225,20 @@ def load_leaderboard(week_start=None, db_path=DB_PATH):
     pitching_points = {}
     if selected_week_end and selected_week_end < date.today():
         cursor.execute(
-            """
+            f"""
             SELECT team_id, value
             FROM points
-            WHERE date = ? AND type = 'offense'
+            WHERE date = {ph} AND type = 'offense'
             """,
             (selected_week_end.isoformat(),),
         )
         offense_points = {row["team_id"]: row["value"] for row in cursor.fetchall()}
 
         cursor.execute(
-            """
+            f"""
             SELECT team_id, value
             FROM points
-            WHERE date = ? AND type = 'defense'
+            WHERE date = {ph} AND type = 'defense'
             """,
             (selected_week_end.isoformat(),),
         )
@@ -279,9 +279,9 @@ def week_view():
 
 
 def load_player_details(player_id, db_path=DB_PATH):
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
+    conn = get_connection(db_path)
     cursor = conn.cursor()
+    ph = param_placeholder()
 
     cursor.execute(
         """
@@ -295,8 +295,8 @@ def load_player_details(player_id, db_path=DB_PATH):
         FROM players p
         LEFT JOIN team_player tp ON tp.player_id = p.id
         LEFT JOIN teams t ON t.id = tp.team_id
-        WHERE p.id = ?
-        """,
+        WHERE p.id = {ph}
+        """.format(ph=ph),
         (player_id,),
     )
     player = cursor.fetchone()
@@ -305,7 +305,7 @@ def load_player_details(player_id, db_path=DB_PATH):
         return None, [], None
 
     cursor.execute(
-        "SELECT MIN(date) AS first_date FROM stats WHERE player_id = ?",
+        f"SELECT MIN(date) AS first_date FROM stats WHERE player_id = {ph}",
         (player_id,),
     )
     first_row = cursor.fetchone()
@@ -322,10 +322,10 @@ def load_player_details(player_id, db_path=DB_PATH):
             """
             SELECT date, offense, pitching
             FROM stats
-            WHERE player_id = ? AND date LIKE ?
+            WHERE player_id = {ph} AND date LIKE {ph}
               AND (COALESCE(offense, 0) != 0 OR COALESCE(pitching, 0) != 0)
             ORDER BY date DESC
-            """,
+            """.format(ph=ph),
             (player_id, f"{year}-%"),
         )
         stats_rows = cursor.fetchall()
@@ -350,8 +350,7 @@ def player_view():
 
 
 def load_season_totals(db_path=DB_PATH):
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
+    conn = get_connection(db_path)
     cursor = conn.cursor()
 
     cursor.execute(
@@ -380,8 +379,7 @@ def season_view():
 
 
 def load_available_players(db_path=DB_PATH):
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
+    conn = get_connection(db_path)
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -405,6 +403,45 @@ def load_available_players(db_path=DB_PATH):
 def available_view():
     rows = load_available_players()
     return render_template("available.html", rows=rows)
+
+
+def load_audit(page, page_size=50, db_path=DB_PATH):
+    conn = get_connection(db_path)
+    cursor = conn.cursor()
+    ph = param_placeholder()
+
+    cursor.execute("SELECT COUNT(*) AS count FROM audit")
+    total = cursor.fetchone()["count"]
+
+    offset = (page - 1) * page_size
+    cursor.execute(
+        f"""
+        SELECT datetime, table_name, operation, old_value, new_value
+        FROM audit
+        ORDER BY datetime DESC, id DESC
+        LIMIT {ph} OFFSET {ph}
+        """,
+        (page_size, offset),
+    )
+    rows = cursor.fetchall()
+    conn.close()
+
+    total_pages = max(1, (total + page_size - 1) // page_size)
+    return rows, total_pages
+
+
+@app.route("/audit")
+def audit_view():
+    page = request.args.get("page", type=int) or 1
+    if page < 1:
+        page = 1
+    rows, total_pages = load_audit(page)
+    return render_template(
+        "audit.html",
+        rows=rows,
+        page=page,
+        total_pages=total_pages,
+    )
 
 
 if __name__ == "__main__":

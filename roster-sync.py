@@ -1,12 +1,14 @@
-import sqlite3
 from datetime import datetime, timezone
 from pymlb_statsapi import api
+
+from db import get_connection, param_placeholder
 
 PHILLIES_TEAM_ID = 143
 
 def sync_phillies_40_man(db_path="ebl.db", roster_date=None):
-    conn = sqlite3.connect(db_path)
+    conn = get_connection(db_path)
     cursor = conn.cursor()
+    ph = param_placeholder()
 
     # Track active MLB IDs this sync
     active_mlb_ids = set()
@@ -45,7 +47,7 @@ def sync_phillies_40_man(db_path="ebl.db", roster_date=None):
         bat_side = person.get("batSide", {})
         throw_side = person.get("pitchHand", {})
 
-        cursor.execute("""
+        cursor.execute(f"""
         INSERT INTO players (
             mlb_id,
             name,
@@ -69,7 +71,7 @@ def sync_phillies_40_man(db_path="ebl.db", roster_date=None):
             last_updated
         )
         VALUES (
-            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,1,?
+            {ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},1,{ph}
         )
         ON CONFLICT(mlb_id) DO UPDATE SET
             name              = excluded.name,
@@ -116,12 +118,12 @@ def sync_phillies_40_man(db_path="ebl.db", roster_date=None):
     # -------------------------
     # 3. Deactivate removed players
     # -------------------------
-    cursor.execute("""
+    cursor.execute(f"""
     UPDATE players
     SET is_active = 0,
-        last_updated = ?
+        last_updated = {ph}
     WHERE mlb_id NOT IN ({})
-    """.format(",".join("?" * len(active_mlb_ids))),
+    """.format(",".join([ph] * len(active_mlb_ids))),
     (datetime.now(timezone.utc).isoformat(sep=" "), *active_mlb_ids))
 
     conn.commit()

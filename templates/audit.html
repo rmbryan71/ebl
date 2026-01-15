@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EBL Audit</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/week">Weekly Standings</a>
+      <a href="/season">Season Standings</a>
+      <a href="/available">Available Players</a>
+      <a href="/audit">Audit</a>
+      <a href="https://www.robertbryan.net/ebl.html" target="_blank" rel="noopener">Rules</a>
+    </nav>
+    <nav class="bottom-nav">
+      <a href="/">Home</a>
+      <a href="/week">Week</a>
+      <a href="/season">Season</a>
+    </nav>
+    <header class="hero">
+      <div class="hero-content">
+        <h1 class="league-title league-title--small">Audit Trail</h1>
+      </div>
+    </header>
+
+    <main class="stats audit-page">
+      <section class="stats-table audit-table">
+        <div class="stats-row header audit-row">
+          <span>Date/time</span>
+          <span>Table</span>
+          <span>Operation</span>
+          <span>Old value</span>
+          <span>New value</span>
+        </div>
+        {% for row in rows %}
+        <div class="stats-row audit-row" style="--i: {{ loop.index0 }}">
+          <span>{{ row.datetime }}</span>
+          <span>{{ row.table_name }}</span>
+          <span>{{ row.operation }}</span>
+          <span class="audit-json">{{ row.old_value or "-" }}</span>
+          <span class="audit-json">{{ row.new_value or "-" }}</span>
+        </div>
+        {% endfor %}
+      </section>
+
+      <div class="audit-pagination">
+        {% if page > 1 %}
+        <a href="/audit?page={{ page - 1 }}">Previous</a>
+        {% endif %}
+        <span>Page {{ page }} of {{ total_pages }}</span>
+        {% if page < total_pages %}
+        <a href="/audit?page={{ page + 1 }}">Next</a>
+        {% endif %}
+      </div>
+
+      <p class="audit-mobile-note">Audit trail is available on larger screens.</p>
+    </main>
+  </body>
+</html>
