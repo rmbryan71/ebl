@@ -261,6 +261,22 @@ def main():
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(SCHEMA_SQL)
+            cur.execute(
+                """
+                TRUNCATE TABLE
+                  team_player,
+                  stats,
+                  points,
+                  roster_move_request_players,
+                  roster_move_requests,
+                  players,
+                  teams,
+                  users,
+                  leagues,
+                  audit
+                RESTART IDENTITY CASCADE
+                """
+            )
 
     print("Postgres schema created.")
 
