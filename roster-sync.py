@@ -1,14 +1,14 @@
 from datetime import datetime, timezone
 from pymlb_statsapi import api
 
-from db import get_connection, param_placeholder
+from db import get_connection, ensure_identities
 
 PHILLIES_TEAM_ID = 143
 
-def sync_phillies_40_man(db_path="ebl.db", roster_date=None):
-    conn = get_connection(db_path)
+def sync_phillies_40_man(roster_date=None):
+    conn = get_connection()
     cursor = conn.cursor()
-    ph = param_placeholder()
+    ensure_identities(conn, ["players"])
 
     # Track active MLB IDs this sync
     active_mlb_ids = set()
@@ -47,7 +47,7 @@ def sync_phillies_40_man(db_path="ebl.db", roster_date=None):
         bat_side = person.get("batSide", {})
         throw_side = person.get("pitchHand", {})
 
-        cursor.execute(f"""
+        cursor.execute("""
         INSERT INTO players (
             mlb_id,
             name,
@@ -71,7 +71,7 @@ def sync_phillies_40_man(db_path="ebl.db", roster_date=None):
             last_updated
         )
         VALUES (
-            {ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},{ph},1,{ph}
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,%s
         )
         ON CONFLICT(mlb_id) DO UPDATE SET
             name              = excluded.name,
@@ -118,13 +118,17 @@ def sync_phillies_40_man(db_path="ebl.db", roster_date=None):
     # -------------------------
     # 3. Deactivate removed players
     # -------------------------
-    cursor.execute(f"""
-    UPDATE players
-    SET is_active = 0,
-        last_updated = {ph}
-    WHERE mlb_id NOT IN ({})
-    """.format(",".join([ph] * len(active_mlb_ids))),
-    (datetime.now(timezone.utc).isoformat(sep=" "), *active_mlb_ids))
+    if active_mlb_ids:
+        placeholders = ",".join(["%s"] * len(active_mlb_ids))
+        cursor.execute(
+            f"""
+            UPDATE players
+            SET is_active = 0,
+                last_updated = %s
+            WHERE mlb_id NOT IN ({placeholders})
+            """,
+            (datetime.now(timezone.utc).isoformat(sep=" "), *active_mlb_ids),
+        )
 
     conn.commit()
     conn.close()
@@ -144,4 +148,4 @@ if __name__ == "__main__":
             continue
         roster_date = roster_input
         break
-    sync_phillies_40_man("ebl.db", roster_date=roster_date)
+    sync_phillies_40_man(roster_date=roster_date)

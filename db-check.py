@@ -1,12 +1,11 @@
-from db import DATABASE_URL, using_postgres
+from db import DATABASE_URL
 
 
 def main():
-    if using_postgres():
-        print("Database: Postgres")
-        print(f"DATABASE_URL: {DATABASE_URL}")
-    else:
-        print("Database: SQLite (ebl.db)")
+    if not DATABASE_URL:
+        raise SystemExit("DATABASE_URL is not set.")
+    print("Database: Postgres")
+    print(f"DATABASE_URL: {DATABASE_URL}")
 
 
 if __name__ == "__main__":

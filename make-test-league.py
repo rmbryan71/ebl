@@ -1,10 +1,8 @@
 import random
 
-from db import get_connection, param_placeholder
+from db import get_connection, ensure_identities
 
 TEAM_NAMES_PATH = "test-team-names.md"
-
-DB_PATH = "ebl.db"
 
 def load_team_names(path=TEAM_NAMES_PATH):
     with open(path, "r") as handle:
@@ -14,7 +12,7 @@ def load_team_names(path=TEAM_NAMES_PATH):
 
 def make_test_league_and_teams(conn, team_count=8, seed=None):
     cursor = conn.cursor()
-    ph = param_placeholder()
+    ensure_identities(conn, ["leagues", "users", "teams"])
 
     cursor.execute("SELECT id FROM leagues ORDER BY id LIMIT 1")
     row = cursor.fetchone()
@@ -22,7 +20,7 @@ def make_test_league_and_teams(conn, team_count=8, seed=None):
         league_id = row["id"]
     else:
         cursor.execute(
-            f"INSERT INTO leagues (name, year, mlb_team) VALUES ({ph}, {ph}, {ph})",
+            "INSERT INTO leagues (name, year, mlb_team) VALUES (%s, %s, %s)",
             ("EBL 2025", 2025, "PHI"),
         )
         cursor.execute("SELECT id FROM leagues ORDER BY id DESC LIMIT 1")
@@ -33,7 +31,7 @@ def make_test_league_and_teams(conn, team_count=8, seed=None):
     if len(user_ids) < team_count:
         for idx in range(len(user_ids) + 1, team_count + 1):
             cursor.execute(
-                f"INSERT INTO users (email) VALUES ({ph})",
+                "INSERT INTO users (email) VALUES (%s)",
                 (f"test_owner_{idx}@ebl.local",),
             )
         cursor.execute("SELECT id FROM users ORDER BY id")
@@ -47,7 +45,7 @@ def make_test_league_and_teams(conn, team_count=8, seed=None):
         rng.shuffle(team_names)
         for idx in range(len(team_ids) + 1, team_count + 1):
             cursor.execute(
-                f"INSERT INTO teams (league_id, user_id, name) VALUES ({ph}, {ph}, {ph})",
+                "INSERT INTO teams (league_id, user_id, name) VALUES (%s, %s, %s)",
                 (league_id, user_ids[idx - 1], team_names[idx - 1]),
             )
         cursor.execute("SELECT id FROM teams ORDER BY id")
@@ -58,7 +56,7 @@ def make_test_league_and_teams(conn, team_count=8, seed=None):
 
 def assign_players_to_teams(conn, team_ids, force=False, seed=None, max_per_team=4):
     cursor = conn.cursor()
-    ph = param_placeholder()
+    ensure_identities(conn, ["team_player"])
     if force:
         cursor.execute("DELETE FROM team_player")
     else:
@@ -86,9 +84,9 @@ def assign_players_to_teams(conn, team_ids, force=False, seed=None, max_per_team
         rows.append((team_id, player_id))
 
     cursor.executemany(
-        f"""
+        """
         INSERT INTO team_player (team_id, player_id)
-        VALUES ({ph}, {ph})
+        VALUES (%s, %s)
         ON CONFLICT DO NOTHING
         """,
         rows,
@@ -97,7 +95,7 @@ def assign_players_to_teams(conn, team_ids, force=False, seed=None, max_per_team
 
 
 if __name__ == "__main__":
-    with get_connection(DB_PATH) as conn:
+    with get_connection() as conn:
         team_ids = make_test_league_and_teams(conn)
         assigned = assign_players_to_teams(conn, team_ids, force=True)
         conn.commit()

@@ -1,9 +1,6 @@
 from datetime import datetime, timedelta
 
-from db import get_connection, param_placeholder
-
-DB_PATH = "ebl.db"
-
+from db import get_connection, ensure_identities
 
 OFFENSE_POINTS = {1: 10, 2: 8, 3: 4}
 DEFENSE_POINTS = {1: 10, 2: 8, 3: 4}
@@ -67,17 +64,17 @@ def award_points_for_category(team_totals, points_map):
     return awards
 
 
-def score_weeks(db_path=DB_PATH):
-    with get_connection(db_path) as conn:
+def score_weeks():
+    with get_connection() as conn:
         cursor = conn.cursor()
-        ph = param_placeholder()
+        ensure_identities(conn, ["points"])
         weekly = load_weekly_totals(conn)
         point_rows = []
         for week_start_date, team_totals in weekly.items():
             week_end_date = week_end(week_start_date)
 
             cursor.execute(
-                f"SELECT COUNT(*) AS count FROM points WHERE date = {ph}",
+                "SELECT COUNT(*) AS count FROM points WHERE date = %s",
                 (week_end_date.isoformat(),),
             )
             if cursor.fetchone()["count"] > 0:
@@ -106,9 +103,9 @@ def score_weeks(db_path=DB_PATH):
 
         if point_rows:
             cursor.executemany(
-                f"""
+                """
                 INSERT INTO points (team_id, date, value, type)
-                VALUES ({ph}, {ph}, {ph}, {ph})
+                VALUES (%s, %s, %s, %s)
                 """,
                 point_rows,
             )

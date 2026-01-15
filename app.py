@@ -3,16 +3,13 @@ from datetime import date, datetime, timedelta
 
 from flask import Flask, render_template, request
 
-from db import get_connection, param_placeholder
-
-
-DB_PATH = "ebl.db"
+from db import get_connection
 
 app = Flask(__name__)
 
 
-def load_roster(db_path=DB_PATH):
-    conn = get_connection(db_path)
+def load_roster():
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -51,10 +48,9 @@ def load_roster(db_path=DB_PATH):
     return teams, total_players
 
 
-def load_team_stats(team_id=None, db_path=DB_PATH):
-    conn = get_connection(db_path)
+def load_team_stats(team_id=None):
+    conn = get_connection()
     cursor = conn.cursor()
-    ph = param_placeholder()
 
     cursor.execute("SELECT id, name FROM teams ORDER BY name")
     teams = cursor.fetchall()
@@ -75,11 +71,11 @@ def load_team_stats(team_id=None, db_path=DB_PATH):
             p.name AS player_name
         FROM stats s
         JOIN players p ON p.id = s.player_id
-        WHERE s.team_id = {ph}
+        WHERE s.team_id = %s
           AND (COALESCE(s.offense, 0) != 0 OR COALESCE(s.pitching, 0) != 0)
         """ + date_filter + """
         ORDER BY s.date DESC, p.name
-        """.format(ph=ph),
+        """,
         params,
     )
     rows = cursor.fetchall()
@@ -95,10 +91,10 @@ def load_team_stats(team_id=None, db_path=DB_PATH):
         JOIN players p ON p.id = tp.player_id
         LEFT JOIN stats s
             ON s.player_id = p.id AND s.team_id = tp.team_id
-        WHERE tp.team_id = {ph}
+        WHERE tp.team_id = %s
         GROUP BY p.id
         ORDER BY p.name
-        """.format(ph=ph),
+        """,
         (selected_team_id,),
     )
     player_totals = cursor.fetchall()
@@ -106,14 +102,13 @@ def load_team_stats(team_id=None, db_path=DB_PATH):
     totals_params = [selected_team_id]
     totals_filter = ""
     cursor.execute(
-        f"""
+        """
         SELECT
             SUM(offense) AS total_offense,
             SUM(pitching) AS total_pitching
         FROM stats
-        WHERE team_id = {ph}
-        {totals_filter}
-        """,
+        WHERE team_id = %s
+        """ + totals_filter,
         totals_params,
     )
     totals = cursor.fetchone()
@@ -156,10 +151,9 @@ def team_stats():
     )
 
 
-def load_leaderboard(week_start=None, db_path=DB_PATH):
-    conn = get_connection(db_path)
+def load_leaderboard(week_start=None):
+    conn = get_connection()
     cursor = conn.cursor()
-    ph = param_placeholder()
 
     cursor.execute("SELECT DISTINCT date FROM stats ORDER BY date DESC")
     dates = []
@@ -193,7 +187,7 @@ def load_leaderboard(week_start=None, db_path=DB_PATH):
     selected_week_end = None
     if selected_week_start:
         selected_week_end = selected_week_start + timedelta(days=6)
-        date_filter = f"WHERE s.date BETWEEN {ph} AND {ph}"
+        date_filter = "WHERE s.date BETWEEN %s AND %s"
         params.extend([selected_week_start.isoformat(), selected_week_end.isoformat()])
 
     cursor.execute(
@@ -232,20 +226,20 @@ def load_leaderboard(week_start=None, db_path=DB_PATH):
     pitching_points = {}
     if selected_week_end and selected_week_end < date.today():
         cursor.execute(
-            f"""
+            """
             SELECT team_id, value
             FROM points
-            WHERE date = {ph} AND type = 'offense'
+            WHERE date = %s AND type = 'offense'
             """,
             (selected_week_end.isoformat(),),
         )
         offense_points = {row["team_id"]: row["value"] for row in cursor.fetchall()}
 
         cursor.execute(
-            f"""
+            """
             SELECT team_id, value
             FROM points
-            WHERE date = {ph} AND type = 'defense'
+            WHERE date = %s AND type = 'defense'
             """,
             (selected_week_end.isoformat(),),
         )
@@ -285,10 +279,9 @@ def week_view():
     )
 
 
-def load_player_details(player_id, db_path=DB_PATH):
-    conn = get_connection(db_path)
+def load_player_details(player_id):
+    conn = get_connection()
     cursor = conn.cursor()
-    ph = param_placeholder()
 
     cursor.execute(
         """
@@ -302,8 +295,8 @@ def load_player_details(player_id, db_path=DB_PATH):
         FROM players p
         LEFT JOIN team_player tp ON tp.player_id = p.id
         LEFT JOIN teams t ON t.id = tp.team_id
-        WHERE p.id = {ph}
-        """.format(ph=ph),
+        WHERE p.id = %s
+        """,
         (player_id,),
     )
     player = cursor.fetchone()
@@ -312,7 +305,7 @@ def load_player_details(player_id, db_path=DB_PATH):
         return None, [], None
 
     cursor.execute(
-        f"SELECT MIN(date) AS first_date FROM stats WHERE player_id = {ph}",
+        "SELECT MIN(date) AS first_date FROM stats WHERE player_id = %s",
         (player_id,),
     )
     first_row = cursor.fetchone()
@@ -335,10 +328,10 @@ def load_player_details(player_id, db_path=DB_PATH):
             """
             SELECT date, offense, pitching
             FROM stats
-            WHERE player_id = {ph} AND date LIKE {ph}
+            WHERE player_id = %s AND date::text LIKE %s
               AND (COALESCE(offense, 0) != 0 OR COALESCE(pitching, 0) != 0)
             ORDER BY date DESC
-            """.format(ph=ph),
+            """,
             (player_id, f"{year}-%"),
         )
         stats_rows = cursor.fetchall()
@@ -362,8 +355,8 @@ def player_view():
     )
 
 
-def load_season_totals(db_path=DB_PATH):
-    conn = get_connection(db_path)
+def load_season_totals():
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
@@ -391,8 +384,8 @@ def season_view():
     return render_template("season.html", rows=rows)
 
 
-def load_available_players(db_path=DB_PATH):
-    conn = get_connection(db_path)
+def load_available_players():
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -418,21 +411,20 @@ def available_view():
     return render_template("available.html", rows=rows)
 
 
-def load_audit(page, page_size=50, db_path=DB_PATH):
-    conn = get_connection(db_path)
+def load_audit(page, page_size=50):
+    conn = get_connection()
     cursor = conn.cursor()
-    ph = param_placeholder()
 
     cursor.execute("SELECT COUNT(*) AS count FROM audit")
     total = cursor.fetchone()["count"]
 
     offset = (page - 1) * page_size
     cursor.execute(
-        f"""
+        """
         SELECT datetime, table_name, operation, old_value, new_value
         FROM audit
         ORDER BY datetime DESC, id DESC
-        LIMIT {ph} OFFSET {ph}
+        LIMIT %s OFFSET %s
         """,
         (page_size, offset),
     )
