@@ -83,15 +83,12 @@ def populate_2025_stats(db_path="ebl.db", replace=True, game_type="R", start_dat
                     params.append(end_date.isoformat())
             else:
                 if using_postgres():
-                    date_clause = "CAST(date AS TEXT) LIKE '2025-%'"
+                    date_clause = "CAST(date AS TEXT) LIKE '2025-%%'"
                 else:
                     date_clause = "date LIKE '2025-%'"
             params.extend(player_ids)
-            cursor.execute(
-                f"DELETE FROM stats WHERE {date_clause} "
-                f"AND player_id IN ({placeholders})",
-                params,
-            )
+            delete_sql = f"DELETE FROM stats WHERE {date_clause} AND player_id IN ({placeholders})"
+            cursor.execute(delete_sql, params)
 
         rows = []
         for player in players:
