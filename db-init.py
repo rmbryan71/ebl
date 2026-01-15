@@ -1,7 +1,7 @@
 import os
 from importlib.util import module_from_spec, spec_from_file_location
 
-from db import get_connection
+from db import get_connection, ensure_identities
 from scoring import score_weeks
 
 
@@ -261,6 +261,21 @@ def main():
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(SCHEMA_SQL)
+            ensure_identities(
+                conn,
+                [
+                    "leagues",
+                    "users",
+                    "teams",
+                    "players",
+                    "team_player",
+                    "stats",
+                    "points",
+                    "roster_move_requests",
+                    "roster_move_request_players",
+                    "audit",
+                ],
+            )
             cur.execute(
                 """
                 TRUNCATE TABLE
