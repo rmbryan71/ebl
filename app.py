@@ -1,11 +1,54 @@
-from collections import defaultdict
+from collections import defaultdict, deque
 from datetime import date, datetime, timedelta
+import os
+import time
 
-from flask import Flask, render_template, request
+from flask import Flask, abort, redirect, render_template, request
 
 from db import get_connection
 
 app = Flask(__name__)
+
+RATE_LIMITS = {
+    "default": (120, 60),
+    "audit": (30, 60),
+}
+REQUEST_HISTORY = defaultdict(deque)
+ENFORCE_HTTPS = os.getenv("FORCE_HTTPS", "").lower() in {"1", "true", "yes"}
+
+
+def get_client_ip():
+    forwarded_for = request.headers.get("X-Forwarded-For", "")
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+    return request.remote_addr or "unknown"
+
+
+def apply_rate_limit(bucket, max_requests, window_seconds):
+    now = time.time()
+    history = REQUEST_HISTORY[bucket]
+    while history and now - history[0] > window_seconds:
+        history.popleft()
+    if len(history) >= max_requests:
+        abort(429)
+    history.append(now)
+
+
+@app.before_request
+def enforce_https_and_rate_limit():
+    if request.path.startswith("/static/"):
+        return None
+
+    if ENFORCE_HTTPS and not request.is_secure:
+        forwarded_proto = request.headers.get("X-Forwarded-Proto", "")
+        if forwarded_proto == "http":
+            return redirect(request.url.replace("http://", "https://", 1), code=301)
+
+    ip = get_client_ip()
+    limit_key = "audit" if request.path == "/audit" else "default"
+    max_requests, window_seconds = RATE_LIMITS[limit_key]
+    apply_rate_limit(f"{limit_key}:{ip}", max_requests, window_seconds)
+    return None
 
 
 @app.after_request
@@ -161,6 +204,8 @@ def roster_view():
 @app.route("/team")
 def team_stats():
     team_id = request.args.get("team_id", type=int)
+    if team_id is not None and team_id <= 0:
+        abort(400)
     teams, selected_team_id, selected_team_name, rows, totals, player_totals = load_team_stats(
         team_id=team_id
     )
@@ -291,6 +336,8 @@ def week_view():
         offense_points,
         pitching_points,
     ) = load_leaderboard(week_start=week_start)
+    if week_start and selected_week_start is None and week_starts:
+        abort(400)
     return render_template(
         "leaderboard.html",
         offense_rows=offense_rows,
@@ -367,6 +414,8 @@ def load_player_details(player_id):
 @app.route("/player")
 def player_view():
     player_id = request.args.get("player_id", type=int)
+    if player_id is not None and player_id <= 0:
+        abort(400)
     if not player_id:
         return render_template("player.html", player=None, stats_rows=[], year=None)
 
@@ -463,7 +512,7 @@ def load_audit(page, page_size=50):
 def audit_view():
     page = request.args.get("page", type=int) or 1
     if page < 1:
-        page = 1
+        abort(400)
     rows, total_pages = load_audit(page)
     return render_template(
         "audit.html",
@@ -474,4 +523,4 @@ def audit_view():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
