@@ -2,7 +2,7 @@ services:
   - type: web
     name: ebl
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && python scripts/build_news.py
     startCommand: gunicorn app:app
     envVars:
       - key: TZ

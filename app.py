@@ -1,6 +1,9 @@
 from collections import defaultdict, deque
 from datetime import date, datetime, timedelta
 import os
+from pathlib import Path
+import subprocess
+import sys
 import time
 
 from flask import Flask, abort, redirect, render_template, request
@@ -15,6 +18,7 @@ RATE_LIMITS = {
 }
 REQUEST_HISTORY = defaultdict(deque)
 ENFORCE_HTTPS = os.getenv("FORCE_HTTPS", "").lower() in {"1", "true", "yes"}
+AUTO_BUILD_NEWS = os.getenv("AUTO_BUILD_NEWS", "").lower() in {"1", "true", "yes"}
 
 RULES_CHANGELOG = [
     {
@@ -205,6 +209,32 @@ def enforce_https_and_rate_limit():
     limit_key = "audit" if request.path == "/audit" else "default"
     max_requests, window_seconds = RATE_LIMITS[limit_key]
     apply_rate_limit(f"{limit_key}:{ip}", max_requests, window_seconds)
+    return None
+
+
+def should_build_news():
+    if os.getenv("RENDER") or os.getenv("RENDER_SERVICE_ID") or os.getenv("RENDER_INSTANCE_ID"):
+        return False
+    return AUTO_BUILD_NEWS or os.getenv("FLASK_ENV") == "development"
+
+
+NEWS_BUILT = False
+
+
+@app.before_request
+def build_news_on_startup():
+    global NEWS_BUILT
+    if NEWS_BUILT or not should_build_news():
+        return None
+    script_path = Path(__file__).resolve().parent / "scripts" / "build_news.py"
+    if not script_path.exists():
+        NEWS_BUILT = True
+        return None
+    try:
+        subprocess.run([sys.executable, str(script_path)], check=True)
+    except subprocess.CalledProcessError:
+        print("Warning: scripts/build_news.py failed to run on startup.")
+    NEWS_BUILT = True
     return None
 
 
@@ -686,6 +716,11 @@ def rules_view():
         changelog=RULES_CHANGELOG,
         sections=RULES_SECTIONS,
     )
+
+
+@app.route("/news")
+def news_view():
+    return render_template("news.html")
 
 
 if __name__ == "__main__":

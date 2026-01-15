@@ -64,5 +64,6 @@ Statuses: not started, in progress, done, deferred.
 | REQ-059 | not started |  |  | Improve data persistence for deployments. |
 | REQ-060 | not started |  |  | User accounts. |
 | REQ-061 | not started |  |  | Authentication. |
-| REQ-063 | not started |  |  | Move the rules into the app. |
+| REQ-063 | done |  |  | Move the rules into the app. |
 | REQ-064 | not started |  |  | Admin panel. |
+| REQ-065 | not started |  | Website | Move lab notebook into website. |
