@@ -12,7 +12,6 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 6:25 PM - Fixing links in this lab notebook. Do I want to call it "Lab Notebook" or "News"? News is shorter, I'll go with that.
 
 
-
 # January 14, 2026
 4:30 PM - This is my list of things I want to work on in rough priority order:
 1. Web layout that looks good on cell - done

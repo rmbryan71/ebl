@@ -66,4 +66,4 @@ Statuses: not started, in progress, done, deferred.
 | REQ-061 | not started |  |  | Authentication. |
 | REQ-063 | done |  |  | Move the rules into the app. |
 | REQ-064 | not started |  |  | Admin panel. |
-| REQ-065 | not started |  | Website | Move lab notebook into website. |
+| REQ-065 | done |  | Website | Move lab notebook into website. |
