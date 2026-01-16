@@ -16,3 +16,10 @@ cronjobs:
     envVars:
       - key: TZ
         value: America/New_York
+  - name: weekly-roster-moves
+    schedule: "10 4 * * 0"
+    env: python
+    command: python roster-moves.py
+    envVars:
+      - key: TZ
+        value: America/New_York
