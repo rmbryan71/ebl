@@ -1,8 +1,9 @@
 # Experimental Baseball League Rules
 
-The Experimental Baseball League has a [live](https://ebl-k2sj.onrender.com/) prototype. You can always get the [latest development news here](https://www.robertbryan.net/lab.html).
-
 ## Change log
+January 16, 2026: v 1.01 - roster moves
+- Overhauls the roster moves section.
+
 January 13, 2026: v 1.00 - first prototype release
 - Removes the comms plan, tech plan, roadmap, and lists.
 - Removes the privacy and audit trail requirements.
@@ -81,17 +82,24 @@ January 6, 2026: v 0.01 - initial release
 7. If you want all pitchers, all hitters, or any mix of hitters and pitchers, that is fine.
 
 ## Roster Moves
-1. You can make a maximum of 1 roster move attempt per week.
-2. Even if you have more than one open roster spot, you only get one roster move attempt per week.
-3. Roster moves happen Sunday night after points are awarded.
-4. Your roster move attempt includes the name of the player you want to drop and the name of the player you want to add.
-5. You cannot submit a roster move for a player on another team in our league in the hope that the player gets dropped before your turn in the roster move process.
-6. Teams with empty roster spots go first in the roster move process. If more than one team has an empty roster spot, the lower-ranking teams go first.
-7. Aside from teams with empty roster spots, roster move attempts are processed in reverse order of the current league standings. In the case of ties in the league standings, roster move attempts will happen between the tied franchises randomly.
-8. If the player you attempt to add is not available when it comes to your turn in the roster moves process, nothing happens. You do not lose the player you tried to drop. You can try again next week.
-9. When the Phillies add a player, they become available at the end of week they are acquired.
-10. If there is a tie in the standings and two teams try to acquire the same player, the player is assigned randomly.
-11. There is no trading players between teams.
+1. You need to log in to work with roster moves.
+2. After you submit a roster move, it is pending, and you can see it from your team page.
+3. You can never have more than one pending roster move.
+4. If you change your mind and want to make a different roster move, you can submit another one. The previous roster move will be superseded by the new move.
+5. If you change your mind and want to make no roster move, you can delete your pending roster move.
+6. You can change your mind a maximum of 50 times per week. After that, you can choose to delete your pending roster move, but you can't create another one.
+7. Even if you have more than one open roster spot, you only get one roster move per week.
+8. EBL roster moves happen Sunday night after points are awarded.
+9. Your roster move includes the name of the player you want to drop and a prioritized list of up to 3 players to add.
+10. Only available players can be selected for adding to rosters.
+11. Teams with empty roster spots go first in the roster move process. If more than one team has an empty roster spot, the lower-ranking teams go first.
+12. Aside from teams with empty roster spots, roster move attempts are processed in reverse order of the current league standings.
+13. In the case of ties in the league standings, roster moves will happen in the order they were submitted.
+14. If the first player you attempt to add is not available when it comes to your turn in the roster moves process, you automatically attempt to add your second choice. If that player isn't available either, you automatically attempt to add your third choice.
+15. If none of your three choices are available, you do not lose the player you tried to drop.
+16. When the Phillies add a player, they become available for roster moves immediately.
+17. Even if you have an empty roster spot, you can choose to make a roster move by dropping a player.
+18. There is no trading players between teams.
 
 ## The Auction
 1. This will be a Zoom call at 6:00 PM on Sunday, March 22, 2026.

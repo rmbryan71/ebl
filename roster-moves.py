@@ -1,5 +1,4 @@
 import os
-import random
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -10,16 +9,6 @@ from db import get_connection, set_audit_user_id
 EASTERN_TZ = ZoneInfo("America/New_York")
 LOGS_DIR = Path(__file__).resolve().parent / "logs"
 
-
-def get_seed():
-    seed_value = os.getenv("ROSTER_MOVE_SEED")
-    if seed_value is not None:
-        try:
-            return int(seed_value)
-        except ValueError:
-            return 0
-    today = datetime.now(EASTERN_TZ).date()
-    return int(today.strftime("%Y%m%d"))
 
 
 def load_team_points(cursor):
@@ -91,7 +80,7 @@ def load_team_roster(cursor, team_id):
     return cursor.fetchall()
 
 
-def order_teams(team_info, rng):
+def order_teams(team_info):
     empty_groups = {}
     full_groups = {}
     for info in team_info:
@@ -104,11 +93,11 @@ def order_teams(team_info, rng):
     ordered = []
     for points in sorted(empty_groups.keys()):
         group = empty_groups[points]
-        rng.shuffle(group)
+        group.sort(key=lambda item: item["submitted"] or "")
         ordered.extend(group)
     for points in sorted(full_groups.keys()):
         group = full_groups[points]
-        rng.shuffle(group)
+        group.sort(key=lambda item: item["submitted"] or "")
         ordered.extend(group)
     return ordered
 
@@ -132,7 +121,6 @@ def main():
     if not os.getenv("DATABASE_URL"):
         raise SystemExit("DATABASE_URL is not set.")
 
-    rng = random.Random(get_seed())
     log_entries = []
     processed = 0
 
@@ -161,7 +149,7 @@ def main():
                 }
             )
 
-        ordered = order_teams(team_info, rng)
+        ordered = order_teams(team_info)
         log_entries.append("## Processing order")
         for idx, info in enumerate(ordered, start=1):
             log_entries.append(

@@ -219,6 +219,24 @@ a:hover {
   margin-top: 1rem;
 }
 
+.roster-request-actions {
+  margin-top: 1.2rem;
+}
+
+.roster-delete {
+  border: none;
+  background: #d62828;
+  color: #fff;
+  padding: 0.7rem 1.2rem;
+  font-weight: 700;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.roster-delete:hover {
+  background: #b61f1f;
+}
+
 .team-meta {
   font-family: "Poppins", sans-serif;
   font-size: 0.75rem;
@@ -485,6 +503,11 @@ a:hover {
 .roster-move-card h2 {
   margin: 0 0 0.8rem;
   font-size: 1.25rem;
+}
+
+.roster-move-admin {
+  display: grid;
+  gap: 0.6rem;
 }
 
 .roster-move-form {

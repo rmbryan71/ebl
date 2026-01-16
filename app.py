@@ -326,11 +326,12 @@ def team_stats():
     teams, selected_team_id, selected_team_name, rows, totals, player_totals = load_team_stats(
         team_id=team_id
     )
-    show_roster_move = (
-        current_user.is_authenticated
-        and current_user.role == "owner"
-        and current_user.team_id == selected_team_id
-    )
+    show_roster_move = False
+    if current_user.is_authenticated:
+        if current_user.role == "admin":
+            show_roster_move = True
+        elif current_user.role == "owner" and current_user.team_id == selected_team_id:
+            show_roster_move = True
     return render_template(
         "team-stats.html",
         teams=teams,
@@ -710,9 +711,12 @@ def logout_view():
 @login_required
 @owner_or_admin_required
 def roster_move_view():
-    if not current_user.team_id:
+    if current_user.role == "admin":
+        team_id = request.args.get("team_id", type=int) or request.form.get("team_id", type=int)
+    else:
+        team_id = current_user.team_id
+    if not team_id:
         abort(403)
-    team_id = current_user.team_id
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -735,6 +739,9 @@ def roster_move_view():
     )
     team_flags = cursor.fetchone()
     has_empty_roster_spot = bool(team_flags["has_empty_roster_spot"]) if team_flags else False
+
+    cursor.execute("SELECT id, name FROM teams ORDER BY name")
+    teams = cursor.fetchall()
 
     cursor.execute(
         """
@@ -864,13 +871,41 @@ def roster_move_view():
         error=error,
         success=success,
         has_empty_roster_spot=has_empty_roster_spot,
+        teams=teams,
+        selected_team_id=team_id,
     )
 
 
-@app.route("/pending-roster-moves")
+@app.route("/pending-roster-moves", methods=["GET", "POST"])
 @login_required
 @owner_or_admin_required
 def pending_roster_moves_view():
+    if request.method == "POST":
+        request_id = request.form.get("request_id", type=int)
+        if not request_id:
+            abort(400)
+        conn = get_connection()
+        cursor = conn.cursor()
+        if current_user.role == "owner":
+            cursor.execute(
+                """
+                UPDATE roster_move_requests
+                SET status = 'superseded'
+                WHERE id = %s AND team_id = %s AND status = 'pending'
+                """,
+                (request_id, current_user.team_id),
+            )
+        else:
+            cursor.execute(
+                """
+                UPDATE roster_move_requests
+                SET status = 'superseded'
+                WHERE id = %s AND status = 'pending'
+                """,
+                (request_id,),
+            )
+        conn.commit()
+        conn.close()
     if current_user.role == "owner" and current_user.team_id:
         team_filter = "AND r.team_id = %s"
         params = [current_user.team_id]
