@@ -68,4 +68,5 @@ Statuses: not started, in progress, done, deferred.
 | REQ-064 | not started |  |  | Admin panel. |
 | REQ-066 | not started |  | Website | Fix wrapping for long team names. |
 | REQ-067 | not started |  | Roster Moves | Let admins submit roster moves for all teams. |
+| REQ-068 | not started |  | Roster Moves | Roster move testing. |
 | REQ-065 | done |  | Website | Move lab notebook into website. |

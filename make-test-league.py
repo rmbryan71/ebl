@@ -1,18 +1,33 @@
 import random
 
+from werkzeug.security import generate_password_hash
+
 from db import get_connection, ensure_identities
 
-TEAM_NAMES_PATH = "test-team-names.md"
+TEST_LEAGUE_PATH = "test-league.md"
 
-def load_team_names(path=TEAM_NAMES_PATH):
+
+def load_test_league_data(path=TEST_LEAGUE_PATH):
+    sections = {
+        "team names": [],
+        "emails": [],
+        "passwords": [],
+    }
+    current = None
     with open(path, "r") as handle:
-        names = [line.strip() for line in handle.readlines() if line.strip()]
-    return names
+        for raw_line in handle.readlines():
+            line = raw_line.strip()
+            if line.startswith("## "):
+                current = line[3:].strip().lower()
+                continue
+            if current in sections and line.startswith("- "):
+                sections[current].append(line[2:].strip())
+    return sections
 
 
 def make_test_league_and_teams(conn, team_count=8, seed=None):
     cursor = conn.cursor()
-    ensure_identities(conn, ["leagues", "users", "teams"])
+    ensure_identities(conn, ["leagues", "users", "user_accounts", "teams"])
 
     cursor.execute("SELECT id FROM leagues ORDER BY id LIMIT 1")
     row = cursor.fetchone()
@@ -26,32 +41,68 @@ def make_test_league_and_teams(conn, team_count=8, seed=None):
         cursor.execute("SELECT id FROM leagues ORDER BY id DESC LIMIT 1")
         league_id = cursor.fetchone()["id"]
 
-    cursor.execute("SELECT id FROM users ORDER BY id")
-    user_ids = [row["id"] for row in cursor.fetchall()]
-    if len(user_ids) < team_count:
-        for idx in range(len(user_ids) + 1, team_count + 1):
-            cursor.execute(
-                "INSERT INTO users (email) VALUES (%s)",
-                (f"test_owner_{idx}@ebl.local",),
-            )
-        cursor.execute("SELECT id FROM users ORDER BY id")
-        user_ids = [row["id"] for row in cursor.fetchall()]
+    data = load_test_league_data()
+    team_names = data["team names"]
+    emails = data["emails"]
+    passwords = data["passwords"]
 
-    cursor.execute("SELECT id FROM teams ORDER BY id")
-    team_ids = [row["id"] for row in cursor.fetchall()]
-    if len(team_ids) < team_count:
-        team_names = load_team_names()
-        rng = random.Random(seed)
-        rng.shuffle(team_names)
-        for idx in range(len(team_ids) + 1, team_count + 1):
-            cursor.execute(
-                "INSERT INTO teams (league_id, user_id, name) VALUES (%s, %s, %s)",
-                (league_id, user_ids[idx - 1], team_names[idx - 1]),
-            )
-        cursor.execute("SELECT id FROM teams ORDER BY id")
-        team_ids = [row["id"] for row in cursor.fetchall()]
+    if not (len(team_names) == len(emails) == len(passwords) == team_count):
+        raise SystemExit("test-league.md must define 8 team names, emails, and passwords.")
 
-    return team_ids[:team_count]
+    user_ids = []
+    for idx in range(team_count):
+        email = emails[idx].lower()
+        cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+        row = cursor.fetchone()
+        if row:
+            user_id = row["id"]
+        else:
+            cursor.execute("INSERT INTO users (email) VALUES (%s) RETURNING id", (email,))
+            user_id = cursor.fetchone()["id"]
+        user_ids.append(user_id)
+
+    team_ids = []
+    for idx in range(team_count):
+        name = team_names[idx]
+        user_id = user_ids[idx]
+        cursor.execute(
+            "SELECT id FROM teams WHERE league_id = %s AND name = %s",
+            (league_id, name),
+        )
+        row = cursor.fetchone()
+        if row:
+            team_id = row["id"]
+            cursor.execute(
+                "UPDATE teams SET user_id = %s WHERE id = %s",
+                (user_id, team_id),
+            )
+        else:
+            cursor.execute(
+                "INSERT INTO teams (league_id, user_id, name) VALUES (%s, %s, %s) RETURNING id",
+                (league_id, user_id, name),
+            )
+            team_id = cursor.fetchone()["id"]
+        team_ids.append(team_id)
+
+    for idx in range(team_count):
+        email = emails[idx].lower()
+        password_hash = generate_password_hash(passwords[idx])
+        team_id = team_ids[idx]
+        cursor.execute(
+            """
+            INSERT INTO user_accounts (email, password_hash, role, team_id, is_active)
+            VALUES (%s, %s, 'owner', %s, 1)
+            ON CONFLICT (email)
+            DO UPDATE SET
+                password_hash = EXCLUDED.password_hash,
+                role = 'owner',
+                team_id = EXCLUDED.team_id,
+                is_active = 1
+            """,
+            (email, password_hash, team_id),
+        )
+
+    return team_ids
 
 
 def assign_players_to_teams(conn, team_ids, force=False, seed=None, max_per_team=4):

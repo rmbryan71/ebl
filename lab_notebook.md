@@ -1,6 +1,9 @@
 # Introduction
 This is where I keep track of what I'm thinking and doing related to the Experimental Baseball League.
 
+# January 16, 2026
+2:40 AM - As I work, I have ideas for other projects that I want to do after the Experimental Baseball League is up and running. Currently, that's motivating me to work a lot. This morning, I'm going to focus on implementing the rest of the roster move process, then automated testing.
+
 # January 15, 2026
 4:05 AM - Obviously, this is not a sustainable rate of time spent on this project, but I'm awake and this is what I'm thinking about, so I might as well get to work.
 4:35 AM - Did some security hardening and minor tweaks to my pycharm UI.
@@ -11,13 +14,12 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 5:38 PM - I'm moving the rules and this lab notebook into the website.
 6:25 PM - Fixing links in this lab notebook. Do I want to call it "Lab Notebook" or "News"? News is shorter, I'll go with that.
 6:35 PM - Doing a prod deployment.
-6:45 PM - Deprecated and removed the EPB content from robertbryan.net as it's all on the website now.
+6:45 PM - Deprecated and removed the EBL content from robertbryan.net as it's all on the website now.
 7:00 PM - Fixed a few little UI bugs, date display formats, added a case for players who don't have stats yet.
 7:05 PM - Fixed a few places where I was still showing player positions instead of just "Pitcher" or "Hitter".
 7:06 PM - Digging in to implementing user accounts, authentication, and logins. Almost everything on the site is going to be available to the public without login. You only need to log in to see the audit trail and to create roster move requests.
 9:15 PM - Creating owner and admin accounts is done manually with scripts. Assigning owners to teams is a script. When a logged-in owner is on the team page for the team they own, they see a roster move button. That button opens a form where they choose the player they want to drop from their team and their first, second, and third choices for available players to add. Owners can see their pending roster move request after they submit it. If they don't like it or change their mind, they can just submit another roster move request and the old request is superseded. The new request is pending. Owners are limited to 50 roster move attempt requests per week.
 9:30 PM - Doing a prod deploy. Going to db-init and populate stats for half of 2025, make an admin, check the UI, then call it a night.
-
 
 # January 14, 2026
 4:30 PM - This is my list of things I want to work on in rough priority order:
