@@ -66,4 +66,6 @@ Statuses: not started, in progress, done, deferred.
 | REQ-061 | not started |  |  | Authentication. |
 | REQ-063 | done |  |  | Move the rules into the app. |
 | REQ-064 | not started |  |  | Admin panel. |
+| REQ-066 | not started |  | Website | Fix wrapping for long team names. |
+| REQ-067 | not started |  | Roster Moves | Let admins submit roster moves for all teams. |
 | REQ-065 | done |  | Website | Move lab notebook into website. |
