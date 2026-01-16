@@ -72,3 +72,4 @@ Statuses: not started, in progress, done, deferred.
 | REQ-070 | not started |  | Roster Moves | Show team alumni on the team page. |
 | REQ-071 | done |  | Admin | Add an admin account to test setup. |
 | REQ-065 | done |  | Website | Move lab notebook into website. |
+| REQ-072 | not started |  | Website | Phillies transactions page. |
