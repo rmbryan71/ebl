@@ -1,11 +1,26 @@
 from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
 from pymlb_statsapi import api
 
 from db import get_connection, ensure_identities
 
 PHILLIES_TEAM_ID = 143
 
-def sync_phillies_40_man(roster_date=None):
+
+def load_roster_fixture(fixtures_dir, roster_date):
+    if not fixtures_dir:
+        return None
+    date_str = roster_date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    roster_path = Path(fixtures_dir) / "roster" / f"{date_str}.json"
+    if not roster_path.exists():
+        return None
+    data = json.loads(roster_path.read_text(encoding="utf-8"))
+    return data
+
+
+def sync_phillies_40_man(roster_date=None, fixtures_dir=None):
     conn = get_connection()
     cursor = conn.cursor()
     ensure_identities(conn, ["players"])
@@ -16,15 +31,25 @@ def sync_phillies_40_man(roster_date=None):
     # -------------------------
     # 1. Fetch 40-man roster
     # -------------------------
-    roster_params = {
-        "teamId": PHILLIES_TEAM_ID,
-        "rosterType": "40Man",
-    }
-    if roster_date:
-        roster_params["date"] = roster_date
-    roster_resp = api.Team.roster(**roster_params)
-    roster_json = roster_resp.json()
-    roster_rows = roster_json.get("roster", [])
+    fixtures_dir = fixtures_dir or os.getenv("FIXTURES_DIR")
+    roster_fixture = load_roster_fixture(fixtures_dir, roster_date)
+    roster_rows = []
+    people_map = {}
+    if roster_fixture:
+        roster_rows = roster_fixture.get("roster", [])
+        people_map = {
+            int(person["id"]): person for person in roster_fixture.get("people", [])
+        }
+    else:
+        roster_params = {
+            "teamId": PHILLIES_TEAM_ID,
+            "rosterType": "40Man",
+        }
+        if roster_date:
+            roster_params["date"] = roster_date
+        roster_resp = api.Team.roster(**roster_params)
+        roster_json = roster_resp.json()
+        roster_rows = roster_json.get("roster", [])
 
     # -------------------------
     # 2. Process each player
@@ -34,8 +59,10 @@ def sync_phillies_40_man(roster_date=None):
         active_mlb_ids.add(mlb_id)
 
         # Fetch full player record
-        person_resp = api.Person.person(personIds=[mlb_id])
-        person = person_resp.json()["people"][0]
+        person = people_map.get(mlb_id)
+        if person is None:
+            person_resp = api.Person.person(personIds=[mlb_id])
+            person = person_resp.json()["people"][0]
 
         # Parse fields
         first_name = person.get("firstName")

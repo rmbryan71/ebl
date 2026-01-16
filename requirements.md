@@ -71,4 +71,5 @@ Statuses: not started, in progress, done, deferred.
 | REQ-068 | not started |  | Roster Moves | Roster move testing. |
 | REQ-069 | not started |  | Roster Moves | Handle players who leave the Phillies and return in the same year. |
 | REQ-070 | not started |  | Roster Moves | Show team alumni on the team page. |
+| REQ-071 | not started |  | Admin | Add an admin account to test setup. |
 | REQ-065 | done |  | Website | Move lab notebook into website. |
