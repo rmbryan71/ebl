@@ -574,9 +574,9 @@ def load_season_totals():
         SELECT
             t.id AS team_id,
             t.name AS team_name,
-            SUM(CASE WHEN p.type = 'offense' THEN p.value ELSE 0 END) AS offense_points,
-            SUM(CASE WHEN p.type = 'defense' THEN p.value ELSE 0 END) AS pitching_points,
-            SUM(p.value) AS total_points
+            COALESCE(SUM(CASE WHEN p.type = 'offense' THEN p.value ELSE 0 END), 0) AS offense_points,
+            COALESCE(SUM(CASE WHEN p.type = 'defense' THEN p.value ELSE 0 END), 0) AS pitching_points,
+            COALESCE(SUM(p.value), 0) AS total_points
         FROM teams t
         LEFT JOIN points p ON p.team_id = t.id
         GROUP BY t.id
