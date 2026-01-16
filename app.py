@@ -28,6 +28,49 @@ login_manager = LoginManager()
 login_manager.login_view = "login_view"
 login_manager.init_app(app)
 
+class AuthUser(UserMixin):
+    def __init__(self, user_id, email, role, team_id=None, is_active=True):
+        self.id = user_id
+        self.email = email
+        self.role = role
+        self.team_id = team_id
+        self.active = bool(is_active)
+
+    @property
+    def is_active(self):
+        return self.active
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT id, email, role, team_id, is_active
+        FROM user_accounts
+        WHERE id = %s
+        """,
+        (user_id,),
+    )
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        return None
+    return AuthUser(row["id"], row["email"], row["role"], row["team_id"], row["is_active"])
+
+
+def owner_or_admin_required(view_func):
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return login_manager.unauthorized()
+        if current_user.role not in {"admin", "owner"}:
+            abort(403)
+        return view_func(*args, **kwargs)
+
+    return wrapper
+
 RATE_LIMITS = {
     "default": (120, 60),
     "audit": (30, 60),
@@ -826,45 +869,3 @@ def news_view():
 
 if __name__ == "__main__":
     app.run(debug=False)
-class AuthUser(UserMixin):
-    def __init__(self, user_id, email, role, team_id=None, is_active=True):
-        self.id = user_id
-        self.email = email
-        self.role = role
-        self.team_id = team_id
-        self.active = bool(is_active)
-
-    @property
-    def is_active(self):
-        return self.active
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        SELECT id, email, role, team_id, is_active
-        FROM user_accounts
-        WHERE id = %s
-        """,
-        (user_id,),
-    )
-    row = cursor.fetchone()
-    conn.close()
-    if not row:
-        return None
-    return AuthUser(row["id"], row["email"], row["role"], row["team_id"], row["is_active"])
-
-
-def owner_or_admin_required(view_func):
-    @wraps(view_func)
-    def wrapper(*args, **kwargs):
-        if not current_user.is_authenticated:
-            return login_manager.unauthorized()
-        if current_user.role not in {"admin", "owner"}:
-            abort(403)
-        return view_func(*args, **kwargs)
-
-    return wrapper
