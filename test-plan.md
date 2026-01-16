@@ -11,10 +11,15 @@ This plan is written for the current EBL codebase and is meant to be read by a h
 - Fastest tests, easiest to debug, and ideal for CI because they are deterministic.
 
 **Steps**
-1. Identify pure functions to isolate (example: tie resolution in `scoring.py`).
-2. Extract or wrap logic into small, testable functions.
-3. Write tests that feed inputs and assert exact outputs.
-4. Run locally before commits.
+1. Identify pure functions to isolate (examples: tie resolution in `scoring.py`, innings/out conversions in `stats-populate.py`).
+2. Write tests that feed inputs and assert exact outputs.
+3. Run locally before commits.
+
+**Current unit tests added**
+- `tests/test_scoring.py`: `week_start`, `week_end`, and tie-handling in `award_points_for_category`.
+- `tests/test_roster_moves.py`: `order_teams` sorting rules.
+- `tests/test_stats_populate.py`: `innings_to_outs`, `calculate_offense`, and `parse_date`.
+- `tests/test_transactions_sync.py`: `transaction_matches` pattern detection.
 
 **Pros**
 - Fast and reliable.
@@ -143,3 +148,7 @@ This plan is written for the current EBL codebase and is meant to be read by a h
 ## Suggested starting point
 
 Start with unit tests + DB integration tests. They give the best coverage-per-effort. Then add a small Playwright smoke test and a lightweight pipeline test once the basics are stable.
+
+## Notes
+
+- 2026-01-16 21:30 ET: Ran unit tests via `.venv/bin/python -m pytest`; all 12 tests passed.
