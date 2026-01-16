@@ -20,6 +20,8 @@ This plan is written for the current EBL codebase and is meant to be read by a h
 - `tests/test_roster_moves.py`: `order_teams` sorting rules.
 - `tests/test_stats_populate.py`: `innings_to_outs`, `calculate_offense`, and `parse_date`.
 - `tests/test_transactions_sync.py`: `transaction_matches` pattern detection.
+- `tests/test_routes.py`: basic route availability and auth redirects.
+- `tests/test_db_integration.py`: core table existence and audit trigger presence (requires DB).
 
 **Pros**
 - Fast and reliable.
@@ -152,3 +154,5 @@ Start with unit tests + DB integration tests. They give the best coverage-per-ef
 ## Notes
 
 - 2026-01-16 21:30 ET: Ran unit tests via `.venv/bin/python -m pytest`; all 12 tests passed.
+- 2026-01-16 21:45 ET: Added route and DB integration coverage to the test suite.
+- 2026-01-16 21:48 ET: Ran full suite via `.venv/bin/python -m pytest`; 16 passed, 3 skipped.
