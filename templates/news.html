@@ -14,6 +14,9 @@
       <a href="/season">Season Standings</a>
       <a href="/available">Available Players</a>
       <a href="/audit">Audit</a>
+      {% if current_user.is_authenticated and current_user.role == "admin" %}
+      <a href="/pending-roster-moves" class="nav-admin">Pending Roster Moves</a>
+      {% endif %}
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
     </nav>

@@ -194,6 +194,31 @@ a:hover {
   background: var(--accent-dark);
 }
 
+.roster-move-team {
+  font-size: clamp(2rem, 6vw, 3rem);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.roster-request-card h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.roster-request-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--ink-soft);
+  align-items: baseline;
+}
+
+.roster-request-body {
+  display: grid;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
 .team-meta {
   font-family: "Poppins", sans-serif;
   font-size: 0.75rem;
@@ -431,6 +456,12 @@ a:hover {
   margin: 0;
 }
 
+.success-message {
+  color: #1e6a3d;
+  margin: 0;
+  font-weight: 600;
+}
+
 .auth-button {
   border: none;
   background: var(--accent);
@@ -444,6 +475,84 @@ a:hover {
 .auth-button:hover {
   background: var(--accent-dark);
 }
+
+.roster-move-card h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.25rem;
+}
+
+.roster-move-form {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.roster-move-columns {
+  display: grid;
+  gap: 2.8rem;
+}
+
+.roster-move-column {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.roster-move-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.roster-move-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.4rem;
+  border-radius: 10px;
+  background: rgba(15, 26, 44, 0.04);
+}
+
+.roster-move-row--select {
+  grid-template-columns: 1fr auto auto;
+}
+
+.roster-move-name {
+  font-weight: 600;
+}
+
+.roster-move-pill {
+  justify-self: end;
+  white-space: nowrap;
+  color: var(--ink-soft);
+  background: rgba(11, 26, 42, 0.08);
+  border-radius: 999px;
+  padding: 0.1rem 0.6rem;
+  font-size: 0.9em;
+}
+
+.roster-move-select {
+  border: 1px solid rgba(15, 26, 44, 0.2);
+  border-radius: 10px;
+  padding: 0.4rem 0.6rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.roster-submit {
+  border: none;
+  background: #d62828;
+  color: #fff;
+  padding: 0.9rem 1.2rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border-radius: 14px;
+  cursor: pointer;
+  width: min(320px, 100%);
+  justify-self: center;
+}
+
+.roster-submit:hover {
+  background: #b61f1f;
+}
+
 
 .rules-list {
   margin: 0;
@@ -793,6 +902,18 @@ a:hover {
 @media (min-width: 900px) {
   .stats-row {
     grid-template-columns: 1.4fr 2fr 1fr 1fr;
+  }
+
+  .roster-move-columns {
+    grid-template-columns: minmax(220px, 1fr) minmax(320px, 1.4fr);
+    column-gap: 4rem;
+    position: relative;
+    align-items: start;
+    padding: 0 1rem;
+  }
+
+  .roster-request-body {
+    grid-template-columns: 1fr 1fr;
   }
 
   .stats-row span:nth-child(1),

@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS roster_move_request_players (
     roster_move_request_id INTEGER NOT NULL REFERENCES roster_move_requests(id),
     player_id INTEGER NOT NULL REFERENCES players(id),
     action TEXT NOT NULL CHECK (action IN ('add', 'drop')),
+    priority INTEGER CHECK (priority IN (1, 2, 3)),
     UNIQUE (roster_move_request_id, player_id)
 );
 

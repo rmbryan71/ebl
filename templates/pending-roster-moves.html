@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EBL Pending Roster Moves</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/week">Weekly Standings</a>
+      <a href="/season">Season Standings</a>
+      <a href="/available">Available Players</a>
+      <a href="/audit">Audit</a>
+      {% if current_user.is_authenticated and current_user.role == "admin" %}
+      <a href="/pending-roster-moves" class="nav-admin">Pending Roster Moves</a>
+      {% endif %}
+      <a href="/rules" class="nav-rules">Rules</a>
+      <a href="/news" class="nav-news">News</a>
+    </nav>
+    <nav class="bottom-nav">
+      <a href="/">Home</a>
+      <a href="/week">Week</a>
+      <a href="/season">Season</a>
+      <a href="/news">News</a>
+    </nav>
+    <header class="hero">
+      <div class="hero-content">
+        <h1 class="league-title league-title--small">Pending Roster Moves</h1>
+      </div>
+    </header>
+
+    <main class="rules-page">
+      {% if requests %}
+        {% for request in requests %}
+        <section class="rules-card roster-request-card">
+          <div class="roster-request-header">
+            <h2>{{ request.team_name }}</h2>
+            <span>{{ request.submitted_display }}</span>
+          </div>
+          <div class="roster-request-body">
+            <div>
+              <h3>Drop</h3>
+              {% for player in request.players if player.action == 'drop' %}
+              <p class="news-paragraph">{{ player.player_name }}</p>
+              {% endfor %}
+            </div>
+            <div>
+              <h3>Add priorities</h3>
+              <ol class="rules-list">
+                {% for player in request.players if player.action == 'add' %}
+                <li>({{ player.priority }}) {{ player.player_name }}</li>
+                {% endfor %}
+              </ol>
+            </div>
+          </div>
+        </section>
+        {% endfor %}
+      {% else %}
+        <section class="rules-card">
+          <p class="news-paragraph">No pending roster moves.</p>
+        </section>
+      {% endif %}
+    </main>
+  </body>
+</html>

@@ -14,6 +14,9 @@
       <a href="/season">Season Standings</a>
       <a href="/available">Available Players</a>
       <a href="/audit">Audit</a>
+      {% if current_user.is_authenticated and current_user.role == "admin" %}
+      <a href="/pending-roster-moves" class="nav-admin">Pending Roster Moves</a>
+      {% endif %}
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
     </nav>
@@ -26,13 +29,69 @@
     <header class="hero">
       <div class="hero-content">
         <h1 class="league-title league-title--small">Roster Move</h1>
+        <p class="rules-intro roster-move-team">{{ team_name }}</p>
       </div>
     </header>
 
     <main class="rules-page">
-      <section class="rules-card">
-        <p class="news-paragraph">Roster moves are not available yet.</p>
+      <section class="rules-card roster-move-card">
+        <form class="roster-move-form" method="post">
+          <div class="roster-move-columns">
+            <div class="roster-move-column">
+              <h2>Player to drop</h2>
+              <div class="roster-move-list">
+                {% for player in team_players %}
+                <label class="roster-move-row">
+                  <input type="radio" name="drop_player_id" value="{{ player.id }}" required />
+                  <span class="roster-move-name">{{ player.name }}</span>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="roster-move-column">
+              <h2>Players to add</h2>
+              <div class="roster-move-list">
+                {% for player in available_players %}
+                <label class="roster-move-row roster-move-row--select">
+                  <span class="roster-move-name">{{ player.name }}</span>
+                  <select class="roster-move-select" name="choice_{{ player.id }}">
+                    <option value="">Select</option>
+                    <option value="1">First choice</option>
+                    <option value="2">Second choice</option>
+                    <option value="3">Third choice</option>
+                  </select>
+                </label>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          {% if error %}
+          <p class="auth-error">{{ error }}</p>
+          {% endif %}
+          {% if success %}
+          <p class="success-message">{{ success }}</p>
+          {% endif %}
+
+          <button class="roster-submit" type="submit">Submit</button>
+        </form>
       </section>
     </main>
+
+    <script>
+      const selects = Array.from(document.querySelectorAll(".roster-move-select"));
+      selects.forEach((select) => {
+        select.addEventListener("change", () => {
+          const chosen = selects.map((el) => el.value).filter(Boolean);
+          const unique = new Set(chosen);
+          if (chosen.length !== unique.size) {
+            selects.forEach((el) => {
+              el.value = "";
+            });
+          }
+        });
+      });
+    </script>
   </body>
 </html>

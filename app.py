@@ -1,5 +1,5 @@
 from collections import defaultdict, deque
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 import os
 from pathlib import Path
 import subprocess
@@ -18,7 +18,7 @@ from flask_login import (
 )
 from werkzeug.security import check_password_hash
 
-from db import get_connection
+from db import get_connection, set_audit_user_id
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret")
@@ -66,6 +66,18 @@ def owner_or_admin_required(view_func):
         if not current_user.is_authenticated:
             return login_manager.unauthorized()
         if current_user.role not in {"admin", "owner"}:
+            abort(403)
+        return view_func(*args, **kwargs)
+
+    return wrapper
+
+
+def admin_required(view_func):
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return login_manager.unauthorized()
+        if current_user.role != "admin":
             abort(403)
         return view_func(*args, **kwargs)
 
@@ -846,11 +858,190 @@ def logout_view():
     return redirect("/")
 
 
-@app.route("/roster-move")
+@app.route("/roster-move", methods=["GET", "POST"])
 @login_required
 @owner_or_admin_required
 def roster_move_view():
-    return render_template("roster-move.html")
+    if not current_user.team_id:
+        abort(403)
+    team_id = current_user.team_id
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT t.name
+        FROM teams t
+        WHERE t.id = %s
+        """,
+        (team_id,),
+    )
+    team_row = cursor.fetchone()
+    if not team_row:
+        conn.close()
+        abort(404)
+    team_name = team_row["name"]
+
+    cursor.execute(
+        """
+        SELECT p.id, p.name, p.position_name
+        FROM team_player tp
+        JOIN players p ON p.id = tp.player_id
+        WHERE tp.team_id = %s
+        ORDER BY p.name
+        """,
+        (team_id,),
+    )
+    team_players = cursor.fetchall()
+    for row in team_players:
+        position_name = row["position_name"] or ""
+        row["display_position"] = "Pitcher" if position_name == "Pitcher" else "Hitter"
+
+    cursor.execute(
+        """
+        SELECT p.id, p.name, p.position_name
+        FROM players p
+        LEFT JOIN team_player tp ON tp.player_id = p.id
+        WHERE p.is_active = 1 AND tp.player_id IS NULL
+        ORDER BY p.name
+        """
+    )
+    available_players = cursor.fetchall()
+    for row in available_players:
+        position_name = row["position_name"] or ""
+        row["display_position"] = "Pitcher" if position_name == "Pitcher" else "Hitter"
+
+    error = None
+    success = None
+    if request.method == "POST":
+        drop_player_id = request.form.get("drop_player_id", type=int)
+        choice_map = {}
+        for key, value in request.form.items():
+            if not key.startswith("choice_") or not value:
+                continue
+            try:
+                player_id = int(key.split("_", 1)[1])
+            except ValueError:
+                continue
+            choice_map[int(value)] = player_id
+
+        if not drop_player_id:
+            error = "Select a player to drop."
+        elif drop_player_id not in {row["id"] for row in team_players}:
+            error = "Selected drop player is not on your team."
+        elif not choice_map:
+            error = "Select at least one add player."
+        elif not set(choice_map.values()).issubset({row["id"] for row in available_players}):
+            error = "Selected add player is not available."
+        else:
+            try:
+                set_audit_user_id(conn, current_user.id)
+                cursor.execute(
+                    """
+                    DELETE FROM roster_move_request_players
+                    WHERE roster_move_request_id IN (
+                        SELECT id FROM roster_move_requests
+                        WHERE team_id = %s AND status = 'pending'
+                    )
+                    """,
+                    (team_id,),
+                )
+                cursor.execute(
+                    "DELETE FROM roster_move_requests WHERE team_id = %s AND status = 'pending'",
+                    (team_id,),
+                )
+                submitted_at = datetime.now(timezone.utc).isoformat(sep=" ")
+                cursor.execute(
+                    """
+                    INSERT INTO roster_move_requests (team_id, submitted, status)
+                    VALUES (%s, %s, 'pending')
+                    RETURNING id
+                    """,
+                    (team_id, submitted_at),
+                )
+                request_id = cursor.fetchone()["id"]
+                cursor.execute(
+                    """
+                    INSERT INTO roster_move_request_players (roster_move_request_id, player_id, action)
+                    VALUES (%s, %s, 'drop')
+                    """,
+                    (request_id, drop_player_id),
+                )
+                for priority in sorted(choice_map.keys()):
+                    cursor.execute(
+                        """
+                        INSERT INTO roster_move_request_players (
+                            roster_move_request_id,
+                            player_id,
+                            action,
+                            priority
+                        )
+                        VALUES (%s, %s, 'add', %s)
+                        """,
+                        (request_id, choice_map[priority], priority),
+                    )
+                conn.commit()
+                success = "Roster move submitted."
+            except Exception:
+                conn.rollback()
+                raise
+
+    conn.close()
+    return render_template(
+        "roster-move.html",
+        team_name=team_name,
+        team_players=team_players,
+        available_players=available_players,
+        error=error,
+        success=success,
+    )
+
+
+@app.route("/pending-roster-moves")
+@login_required
+@admin_required
+def pending_roster_moves_view():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT r.id, r.team_id, r.submitted, t.name AS team_name
+        FROM roster_move_requests r
+        JOIN teams t ON t.id = r.team_id
+        WHERE r.status = 'pending'
+        ORDER BY r.submitted DESC
+        """
+    )
+    requests = cursor.fetchall()
+    request_ids = [row["id"] for row in requests]
+    players_by_request = {}
+    if request_ids:
+        cursor.execute(
+            """
+            SELECT
+                rmp.roster_move_request_id,
+                rmp.action,
+                rmp.priority,
+                p.name AS player_name
+            FROM roster_move_request_players rmp
+            JOIN players p ON p.id = rmp.player_id
+            WHERE rmp.roster_move_request_id = ANY(%s)
+            ORDER BY rmp.roster_move_request_id, rmp.action, rmp.priority NULLS LAST
+            """,
+            (request_ids,),
+        )
+        for row in cursor.fetchall():
+            players_by_request.setdefault(row["roster_move_request_id"], []).append(row)
+    conn.close()
+
+    for row in requests:
+        value = row["submitted"]
+        if isinstance(value, datetime):
+            row["submitted_display"] = value.strftime("%b %-d, %Y %I:%M %p")
+        else:
+            row["submitted_display"] = value
+        row["players"] = players_by_request.get(row["id"], [])
+
+    return render_template("pending-roster-moves.html", requests=requests)
 
 
 @app.route("/rules")
