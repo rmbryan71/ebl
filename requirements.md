@@ -27,7 +27,6 @@ Statuses: not started, in progress, done, deferred.
 | REQ-021 | done |  |  | Three-way tie for first: all three get first-place points; no other points. |
 | REQ-022 | done |  |  | Six-way tie for third: all six get third-place points. |
 | REQ-023 | done |  |  | Only Phillies 40-man roster players can be on teams. |
-| REQ-024 | not started |  | Roster Moves | Player leaving the Phillies (trade, retirement, death, waiver pickup, or any reason) creates an empty roster spot. |
 | REQ-025 | done |  |  | No remedy for suspensions or injuries (do not create empty spots). |
 | REQ-026 | done |  |  | Empty roster spots never have to be filled. |
 | REQ-027 | done |  |  | Only MLB production counts. |
@@ -41,7 +40,6 @@ Statuses: not started, in progress, done, deferred.
 | REQ-035 | done |  | Roster Moves | Teams with empty roster spots go first; if multiple, lower-ranking teams go first. |
 | REQ-036 | done |  | Roster Moves | Otherwise processed in reverse standings order; ties resolved randomly. |
 | REQ-037 | done |  | Roster Moves | If target player is unavailable, nothing happens; you keep your player. |
-| REQ-038 | not started |  |  | Newly added Phillies players become available at end of week acquired. |
 | REQ-039 | done |  | Roster Moves | If two tied teams attempt same player, assign randomly. |
 | REQ-040 | done |  |  | No trading players between teams. |
 | REQ-041 | done |  |  | Zoom call at 6:00 PM Sunday, March 22, 2026. |
@@ -73,3 +71,5 @@ Statuses: not started, in progress, done, deferred.
 | REQ-071 | done |  | Admin | Add an admin account to test setup. |
 | REQ-065 | done |  | Website | Move lab notebook into website. |
 | REQ-072 | not started |  | Website | Phillies transactions page. |
+| REQ-073 | not started |  |  | Database backup and restore. |
+| REQ-074 | not started |  | Website | Charts and graphs. |
