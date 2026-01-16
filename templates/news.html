@@ -13,14 +13,18 @@
       <a href="/week">Weekly Standings</a>
       <a href="/season">Season Standings</a>
       <a href="/available">Available Players</a>
+      {% if current_user.is_authenticated %}
       <a href="/audit">Audit</a>
-      {% if current_user.is_authenticated and current_user.role in ["admin", "owner"] %}
+      {% if current_user.role in ["admin", "owner"] %}
       <a href="/pending-roster-moves" class="nav-admin">Pending Roster Moves</a>
       {% endif %}
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
-      {% if current_user.is_authenticated %}
       <a href="/logout" class="nav-logout">Logout</a>
+      {% else %}
+      <a href="/rules" class="nav-rules">Rules</a>
+      <a href="/news" class="nav-news">News</a>
+      <a href="/login" class="nav-login">Login</a>
       {% endif %}
     </nav>
     <nav class="bottom-nav">
@@ -37,72 +41,98 @@
     <main class="rules-page news-page">
       <section class="rules-card">
         <h2>Introduction</h2>
-        <div class="news-paragraph"><p>This is where I keep track of what I&#x27;m thinking and doing related to the Experimental Baseball League.</p></div>
+        <div class="news-paragraph"><p>This is where I keep track of what I'm thinking and doing related to the Experimental Baseball League.</p></div>
       </section>
       <section class="rules-card">
         <h2>January 15, 2026</h2>
-        <div class="news-paragraph"><p>4:05 AM - Obviously, this is not a sustainable rate of time spent on this project, but I&#x27;m awake and this is what I&#x27;m thinking about, so I might as well get to work.</p></div>
+        <div class="news-paragraph"><p>4:05 AM - Obviously, this is not a sustainable rate of time spent on this project, but I'm awake and this is what I'm thinking about, so I might as well get to work.</p></div>
 <div class="news-paragraph"><p>4:35 AM - Did some security hardening and minor tweaks to my pycharm UI.</p></div>
 <div class="news-paragraph"><p>5:05 AM - Struggling to authenticate to an existing AWS account to set up email sending.</p></div>
 <div class="news-paragraph"><p>5:45 AM - Created new AWS account and spent 40 minutes trying to figure out how to add new CNAME records to robertbryan.net.</p></div>
-<div class="news-paragraph"><p>4:35 PM - I&#x27;ve decided that sending email can wait for later. Instead of that, I&#x27;m going to work on... what exactly? Not sure. I&#x27;ll start with a review of the requirements and update my lists.</p></div>
-<div class="news-paragraph"><p>5:38 PM - I&#x27;m moving the rules and this lab notebook into the website.</p></div>
-<div class="news-paragraph"><p>6:25 PM -</p></div>
+<div class="news-paragraph"><p>4:35 PM - I've decided that sending email can wait for later. Instead of that, I'm going to work on... what exactly? Not sure. I'll start with a review of the requirements and update my lists.</p></div>
+<div class="news-paragraph"><p>5:38 PM - I'm moving the rules and this lab notebook into the website.</p></div>
+<div class="news-paragraph"><p>6:25 PM - Fixing links in this lab notebook. Do I want to call it "Lab Notebook" or "News"? News is shorter, I'll go with that.</p></div>
+<div class="news-paragraph"><p>6:35 PM - Doing a prod deployment.</p></div>
+<div class="news-paragraph"><p>6:45 PM - Deprecated and removed the EPB content from robertbryan.net as it's all on the website now.</p></div>
+<div class="news-paragraph"><p>7:00 PM - Fixed a few little UI bugs, date display formats, added a case for players who don't have stats yet.</p></div>
+<div class="news-paragraph"><p>7:05 PM - Fixed a few places where I was still showing player positions instead of just "Pitcher" or "Hitter".</p></div>
+<div class="news-paragraph"><p>7:06 PM - Digging in to implementing user accounts, authentication, and logins. Almost everything on the site is going to be available to the public without login. You only need to log in to see the audit trail and to create roster move requests.</p></div>
       </section>
       <section class="rules-card">
         <h2>January 14, 2026</h2>
         <div class="news-paragraph"><p>4:30 PM - This is my list of things I want to work on in rough priority order:</p></div>
 <ol class="rules-list"><li><p>Web layout that looks good on cell - done</p></li><li><p>Scoring that goes weekly instead of whole season at once - done</p></li><li><p>Database persistence - done</p></li><li><p>Load 2025 season data into prod - done</p></li><li><p>Web view of audit trail - done</p></li></ol>
-<div class="news-paragraph"><p>6:05 PM - I&#x27;m satisfied with the web app overhaul to make it cell friendly.</p></div>
+<div class="news-paragraph"><p>6:05 PM - I'm satisfied with the web app overhaul to make it cell friendly.</p></div>
 <div class="news-paragraph"><p>6:35 PM - In the future, should remember to put the server in maintenance mode before pushing experimental code.</p></div>
-<div class="news-paragraph"><p>6:45 PM - I&#x27;ve migrated from SQLite to Postgres in prod. The new web layout looks good on cell.</p></div>
-<div class="news-paragraph"><p>7:02 PM - I&#x27;ve loaded all 2025 season stats into the prod db and run scoring. Everything looks good.</p></div>
-<div class="news-paragraph"><p>7:50 PM - I might need to install Postgres locally. That might actually be simpler than having two different database types.  <br />I also need automated testing.</p></div>
+<div class="news-paragraph"><p>6:45 PM - I've migrated from SQLite to Postgres in prod. The new web layout looks good on cell.</p></div>
+<div class="news-paragraph"><p>7:02 PM - I've loaded all 2025 season stats into the prod db and run scoring. Everything looks good.</p></div>
+<div class="news-paragraph"><p>7:50 PM - I might need to install Postgres locally. That might actually be simpler than having two different database types.<br />
+I also need automated testing.</p></div>
 <div class="news-paragraph"><p>8:00 PM - Installing Postgres locally and ripping out all the SQLite code.</p></div>
 <div class="news-paragraph"><p>8:55 PM - I should not have gone down the path of trying to run SQLite locally and Postgres on Render.</p></div>
 <div class="news-paragraph"><p>9:25 PM - My local environment is stable and running on Postgres.</p></div>
 <div class="news-paragraph"><p>9:35 PM - Troubleshooting db-init.py on Render. I need to remember to time-box future development sessions.</p></div>
-<div class="news-paragraph"><p>9:45 PM - That&#x27;s a wrap. The Render server is up and running with new data, looks good on cell.  <br />my Render Postgres DB is on the Free level, need to remember to upgrade it if it continues to work.</p></div>
+<div class="news-paragraph"><p>9:45 PM - That's a wrap. The Render server is up and running with new data, looks good on cell.<br />
+my Render Postgres DB is on the Free level, need to remember to upgrade it if it continues to work.</p></div>
       </section>
       <section class="rules-card">
         <h2>January 13, 2026</h2>
         <div class="news-paragraph"><p>6:35 AM - Designing screens before work.</p></div>
-<div class="news-paragraph"><p>4:35 PM - Resolved some security vulnerabilities in the website thanks to <a href="https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/configuring-dependabot-security-updates">dependabot</a>.  <br />Drastically simplified the website by removing basically everything except the rules. Everything else was helpful in getting me started, but development is going so fast, just keeping the documentation up to date was slowing me down, so I cut it. I have a web front-end already, so I&#x27;m never going to serve the league as a set of texts lists, so we don&#x27;t need stubs for where those lists will go.</p></div>
+<div class="news-paragraph"><p>4:35 PM - Resolved some security vulnerabilities in the website thanks to <a href="https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/configuring-dependabot-security-updates">dependabot</a>.<br />
+Drastically simplified the website by removing basically everything except the rules. Everything else was helpful in getting me started, but development is going so fast, just keeping the documentation up to date was slowing me down, so I cut it. I have a web front-end already, so I'm never going to serve the league as a set of texts lists, so we don't need stubs for where those lists will go.</p></div>
 <div class="news-paragraph"><p>5:45 PM - I have a scoring function that awards points on Sunday night according to the rules and appears to handle ties correctly.</p></div>
 <div class="news-paragraph"><p>6:45 PM - I have working prototypes of all the main screens.</p></div>
-<div class="news-paragraph"><p>7:00 PM - Made a few last changes. I&#x27;m ready to have people look at this and give feedback. Working on deployment.</p></div>
+<div class="news-paragraph"><p>7:00 PM - Made a few last changes. I'm ready to have people look at this and give feedback. Working on deployment.</p></div>
 <div class="news-paragraph"><p>7:30 PM - I am now a Render Professional license owner. The Experimental Baseball League, which was already operating at a loss because of my ChatGPT license, is now setting money on fire as quickly as we can light it up.</p></div>
 <div class="news-paragraph"><p>7:40 PM - We are live to the world. Our url is: <a href="https://ebl-k2sj.onrender.com/">https://ebl-k2sj.onrender.com/</a>. Now updating the website and sending out comms.</p></div>
 <div class="news-paragraph"><p>8:05 PM - I sent out an email to the league.</p></div>
       </section>
       <section class="rules-card">
         <h2>January 12, 2026</h2>
-        <div class="news-paragraph"><p>5:30 AM - Fixed a few broken links and formatting annoyances on the website.  <br />Now I&#x27;m going to start adding triggers to the database so that all changes get written to the audit log.</p></div>
-<div class="news-paragraph"><p>6:10 AM - AI is helpful. I&#x27;m using free ChatGPT. My <a href="https://github.com/rmbryan71/ebl/blob/main/db-make.py">db-make.py</a> now creates triggers so that all table updates write to the audit trail.  Later, I might want to split db-make into schema, triggers, and indexes.</p></div>
-<div class="news-paragraph"><p>6:40 AM - I&#x27;m working on a function to get player data from MLB and write it into my player table. There&#x27;s a much better Python wrapper for the MLB API, but I need to upgrade Python to use it.</p></div>
-<div class="news-paragraph"><p>6:56 AM - That worked well. I&#x27;m on Python 3.14 now. Upgraded to the latest PyCharm while I was at it.  <br />End session. Next time: Use the new Python wrapper to sync MLB API roster data to the players table.</p></div>
-<div class="news-paragraph"><p>3:50 PM - I upgraded to ChatGPT plus for $20/month. I use it for other things as well. It&#x27;s been extremely helpful so far with coding, so the Experimental Baseball League is now operating at a loss.</p></div>
-<div class="news-paragraph"><p>4:00 PM - Oooooh, my ChatGPT plus subscription comes with Codex that integrates right into the IDE, but not PyCharm... or wait, does it? This is probably worth doing. This is what I&#x27;m doing now.</p></div>
+        <div class="news-paragraph"><p>5:30 AM - Fixed a few broken links and formatting annoyances on the website.<br />
+Now I'm going to start adding triggers to the database so that all changes get written to the audit log.</p></div>
+<div class="news-paragraph"><p>6:10 AM - AI is helpful. I'm using free ChatGPT. My <a href="https://github.com/rmbryan71/ebl/blob/main/db-make.py">db-make.py</a> now creates triggers so that all table updates write to the audit trail.  Later, I might want to split db-make into schema, triggers, and indexes.</p></div>
+<div class="news-paragraph"><p>6:40 AM - I'm working on a function to get player data from MLB and write it into my player table. There's a much better Python wrapper for the MLB API, but I need to upgrade Python to use it.</p></div>
+<div class="news-paragraph"><p>6:56 AM - That worked well. I'm on Python 3.14 now. Upgraded to the latest PyCharm while I was at it.<br />
+End session. Next time: Use the new Python wrapper to sync MLB API roster data to the players table.</p></div>
+<div class="news-paragraph"><p>3:50 PM - I upgraded to ChatGPT plus for $20/month. I use it for other things as well. It's been extremely helpful so far with coding, so the Experimental Baseball League is now operating at a loss.</p></div>
+<div class="news-paragraph"><p>4:00 PM - Oooooh, my ChatGPT plus subscription comes with Codex that integrates right into the IDE, but not PyCharm... or wait, does it? This is probably worth doing. This is what I'm doing now.</p></div>
 <div class="news-paragraph"><p>4:30 PM - Wow, okay. Wow. I have the Codex AI agent integrated into my IDE. It has read and understood the requirements I documented in the <a href="/ebl/constitution.html">EBL Constitution</a>. It understands how the MLB API works. It understands how my database works. It obviously knows how to do everything in Python.</p></div>
-<div class="news-paragraph"><p>4:45 PM - My role is different now. I don&#x27;t have to figure out how to do the things I want to do. It knows how to do everything. I just need to be clear about telling it exactly what I want.</p></div>
-<div class="news-paragraph"><p>5:00 PM - This changes a lot. I don&#x27;t have to limit myself to what I think I can code. That was holding me back. For now, I&#x27;m going to keep moving forward with my plan, but I&#x27;m open to the possibility that having AI available to do things for me means I can do different things, not just the same things faster.</p></div>
+<div class="news-paragraph"><p>4:45 PM - My role is different now. I don't have to figure out how to do the things I want to do. It knows how to do everything. I just need to be clear about telling it exactly what I want.</p></div>
+<div class="news-paragraph"><p>5:00 PM - This changes a lot. I don't have to limit myself to what I think I can code. That was holding me back. For now, I'm going to keep moving forward with my plan, but I'm open to the possibility that having AI available to do things for me means I can do different things, not just the same things faster.</p></div>
 <div class="news-paragraph"><p>5:20 PM - This is going to take some getting used to.</p></div>
 <div class="news-paragraph"><p>5:55 PM - More progress than I can summarize. I have a web front end now, running locally. Taking a break to walk and eat dinner.</p></div>
 <div class="news-paragraph"><p>7:05 PM - I have roster-sync so that it asks for a date and sets the player table to that date.</p></div>
-<div class="news-paragraph"><p>8:05 PM - I have a working web app that reads from my database and a prototype landing page.  <br />!<a href="assets/ebl-rosters-prototype.png">ebl-rosters-prototype.png</a></p></div>
-<div class="news-paragraph"><p>8:55 PM - I have a prototype of a leaderboard.  <br />!<a href="assets/ebl-leaderboard-prototype.png">ebl-leaderboard-prototype.png</a>  <br />The drop-down lets you select any week. All the data is from the database. All the queries work. I&#x27;m using 2025 stats for testing. Players are assigned randomly to EBL teams for testing. Team names are randomly assigned from a list of fantasy baseball team names I found online.  <br />That&#x27;s it for today.</p></div>
+<div class="news-paragraph"><p>8:05 PM - I have a working web app that reads from my database and a prototype landing page.<br />
+<img alt="ebl-rosters-prototype.png" src="assets/ebl-rosters-prototype.png" /></p></div>
+<div class="news-paragraph"><p>8:55 PM - I have a prototype of a leaderboard.<br />
+<img alt="ebl-leaderboard-prototype.png" src="assets/ebl-leaderboard-prototype.png" /><br />
+The drop-down lets you select any week. All the data is from the database. All the queries work. I'm using 2025 stats for testing. Players are assigned randomly to EBL teams for testing. Team names are randomly assigned from a list of fantasy baseball team names I found online.<br />
+That's it for today.</p></div>
       </section>
       <section class="rules-card">
         <h2>January 11, 2026</h2>
-        <div class="news-paragraph"><p>Worked on documentation. Drastically simplified the <a href="/ebl/tech.html">tech plan</a>.  <br />It&#x27;s time to make a <a href="https://en.wikipedia.org/wiki/Database">database</a>.  <br />All of my experience is with <a href="https://en.wikipedia.org/wiki/PostgreSQL">Postgres</a>.  <br />In this case, though, I&#x27;m going to start with <a href="https://en.wikipedia.org/wiki/SQLite">SQLite</a> because:</p></div>
-<ol class="rules-list"><li><p>It doesn&#x27;t require a server.</p></li><li><p>It&#x27;s simpler.</p></li><li><p>It&#x27;s similar enough to Postgres that I&#x27;ll be able to write SQL for it.</p></li></ol>
-<div class="news-paragraph"><p>I&#x27;m going to invest an hour into installing and working with SQLite.  <br />An hour? More like, what, 8 minutes?  <br />That could not _possibly_ have been any easier.  <br />Cool. Okay, now what?  <br /><a href="https://en.wikipedia.org/wiki/Database_design">Database design</a>, probably.  <br />I&#x27;m working <a href="/ebl/db-design.html">here</a>.</p></div>
-<div class="news-paragraph"><p>8:55 PM - Design is complete. I have a <a href="https://github.com/rmbryan71/ebl/blob/main/db-make.py">db-make.py</a> that creates all the tables, fields, and foreign key constraints.  <br />Do I want my db file in git? Oh, it&#x27;s binary, probably not.</p></div>
+        <div class="news-paragraph"><p>Worked on documentation. Drastically simplified the <a href="/ebl/tech.html">tech plan</a>.<br />
+It's time to make a <a href="https://en.wikipedia.org/wiki/Database">database</a>.<br />
+All of my experience is with <a href="https://en.wikipedia.org/wiki/PostgreSQL">Postgres</a>.<br />
+In this case, though, I'm going to start with <a href="https://en.wikipedia.org/wiki/SQLite">SQLite</a> because:</p></div>
+<ol class="rules-list"><li><p>It doesn't require a server.</p></li><li><p>It's simpler.</p></li><li><p>It's similar enough to Postgres that I'll be able to write SQL for it.</p></li></ol>
+<div class="news-paragraph"><p>I'm going to invest an hour into installing and working with SQLite.<br />
+An hour? More like, what, 8 minutes?<br />
+That could not <em>possibly</em> have been any easier.<br />
+Cool. Okay, now what?<br />
+<a href="https://en.wikipedia.org/wiki/Database_design">Database design</a>, probably.<br />
+I'm working <a href="/ebl/db-design.html">here</a>.</p></div>
+<div class="news-paragraph"><p>8:55 PM - Design is complete. I have a <a href="https://github.com/rmbryan71/ebl/blob/main/db-make.py">db-make.py</a> that creates all the tables, fields, and foreign key constraints.<br />
+Do I want my db file in git? Oh, it's binary, probably not.</p></div>
       </section>
       <section class="rules-card">
         <h2>January 10, 2026</h2>
-        <div class="news-paragraph"><p>I&#x27;m removing the .pdf&#x27;s I used to launch the league before moving to the web.  <br />The website is okay for now.  <br />The rules have stabilized enough.  <br />I&#x27;m going to put an hour into trying to write a Python program to fetch the Phillies 40-man roster from the MLB API and write that data to a local text file that gets served to the website. No database. Wipe any previous results, replace with the new results.</p></div>
-<ol class="rules-list"><li><p>I started a <a href="https://github.com/rmbryan71/ebl">fresh Python project</a>.</p></li><li><p>I registered for an MLB Advanced Media API account. They&#x27;re going to review my application.</p></li><li><p>I found a <a href="https://github.com/toddrob99/MLB-StatsAPI">Python wrapper for the MLB API</a>.</p></li><li><p>I made a request and got data. Didn&#x27;t need an account.</p></li><li><p>I got the <a href="https://www.mlb.com/phillies/roster/40-man">current Phillies 40-man roster</a> and <a href="/ebl/40-man-roster.html">wrote it to a file</a>.</p></li></ol>
+        <div class="news-paragraph"><p>I'm removing the .pdf's I used to launch the league before moving to the web.<br />
+The website is okay for now.<br />
+The rules have stabilized enough.<br />
+I'm going to put an hour into trying to write a Python program to fetch the Phillies 40-man roster from the MLB API and write that data to a local text file that gets served to the website. No database. Wipe any previous results, replace with the new results.</p></div>
+<ol class="rules-list"><li><p>I started a <a href="https://github.com/rmbryan71/ebl">fresh Python project</a>.</p></li><li><p>I registered for an MLB Advanced Media API account. They're going to review my application.</p></li><li><p>I found a <a href="https://github.com/toddrob99/MLB-StatsAPI">Python wrapper for the MLB API</a>.</p></li><li><p>I made a request and got data. Didn't need an account.</p></li><li><p>I got the <a href="https://www.mlb.com/phillies/roster/40-man">current Phillies 40-man roster</a> and <a href="/ebl/40-man-roster.html">wrote it to a file</a>.</p></li></ol>
 <div class="news-paragraph"><p>That was easy.</p></div>
       </section>
     </main>

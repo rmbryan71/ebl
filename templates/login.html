@@ -13,14 +13,18 @@
       <a href="/week">Weekly Standings</a>
       <a href="/season">Season Standings</a>
       <a href="/available">Available Players</a>
+      {% if current_user.is_authenticated %}
       <a href="/audit">Audit</a>
-      {% if current_user.is_authenticated and current_user.role in ["admin", "owner"] %}
+      {% if current_user.role in ["admin", "owner"] %}
       <a href="/pending-roster-moves" class="nav-admin">Pending Roster Moves</a>
       {% endif %}
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
-      {% if current_user.is_authenticated %}
       <a href="/logout" class="nav-logout">Logout</a>
+      {% else %}
+      <a href="/rules" class="nav-rules">Rules</a>
+      <a href="/news" class="nav-news">News</a>
+      <a href="/login" class="nav-login">Login</a>
       {% endif %}
     </nav>
     <nav class="bottom-nav">
@@ -31,7 +35,7 @@
     </nav>
     <header class="hero">
       <div class="hero-content">
-        <h1 class="league-title league-title--small">League Admin and Team Owner Login</h1>
+        <h1 class="league-title league-title--small">Login</h1>
       </div>
     </header>
 
