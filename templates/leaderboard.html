@@ -43,7 +43,7 @@
             {% for week_start in week_starts %}
             {% set week_end = week_start + timedelta(days=6) %}
             <option value="{{ week_start.isoformat() }}" {% if selected_week_start == week_start %}selected{% endif %}>
-              {{ week_start.isoformat() }} to {{ week_end.isoformat() }}
+              {{ week_start.strftime('%b %-d') }} to {{ week_end.strftime('%b %-d') }}
             </option>
             {% endfor %}
           </select>
