@@ -6,6 +6,7 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 4:00 AM - I have a start on code to handle when players leave the MLB Phillies. Also, I have test data setup that creates user accounts for 8 team owners, and opens a browser window for each owner, logged in as that owner, navigated to their team page so that I can start testing roster moves. Next, I need to step through the 2025 season one week at a time write test scripts to handle MLB roster changes, EBL roster changes, open roster spots and the roster move request process.
 5:15 AM - Progress on the handling of roster moves. Added a testing for roster move changes. Made a set of scripts to step through the 2025 season day by day and test roster moves and stats. Overhauled the league rules on roster moves.
 
+3:30 PM - Automating testing. 
 
 # January 15, 2026
 4:05 AM - Obviously, this is not a sustainable rate of time spent on this project, but I'm awake and this is what I'm thinking about, so I might as well get to work.

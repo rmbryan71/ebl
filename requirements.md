@@ -33,16 +33,16 @@ Statuses: not started, in progress, done, deferred.
 | REQ-027 | done |  |  | Only MLB production counts. |
 | REQ-028 | done |  |  | No action required for send-downs/call-ups. |
 | REQ-029 | done |  |  | Any mix of hitters/pitchers is allowed. |
-| REQ-030 | not started |  | Roster Moves | Max 1 roster move attempt per week. |
-| REQ-031 | not started |  | Roster Moves | One attempt even if multiple open spots. |
-| REQ-032 | not started |  | Roster Moves | Processed Sunday night after points are awarded. |
-| REQ-033 | not started |  | Roster Moves | A roster move attempt includes one player to drop and three prioritized players to add. |
-| REQ-034 | not started |  | Roster Moves | Cannot target a player on another team hoping they will be dropped before your turn. |
-| REQ-035 | not started |  | Roster Moves | Teams with empty roster spots go first; if multiple, lower-ranking teams go first. |
-| REQ-036 | not started |  | Roster Moves | Otherwise processed in reverse standings order; ties resolved randomly. |
-| REQ-037 | not started |  | Roster Moves | If target player is unavailable, nothing happens; you keep your player. |
+| REQ-030 | done |  | Roster Moves | Max 1 roster move attempt per week. |
+| REQ-031 | done |  | Roster Moves | One attempt even if multiple open spots. |
+| REQ-032 | done |  | Roster Moves | Roster moves are processed Sunday night after points are awarded. |
+| REQ-033 | done |  | Roster Moves | A roster move attempt includes one player to drop and three prioritized players to add. |
+| REQ-034 | done |  | Roster Moves | Cannot target a player on another team hoping they will be dropped before your turn. |
+| REQ-035 | done |  | Roster Moves | Teams with empty roster spots go first; if multiple, lower-ranking teams go first. |
+| REQ-036 | done |  | Roster Moves | Otherwise processed in reverse standings order; ties resolved randomly. |
+| REQ-037 | done |  | Roster Moves | If target player is unavailable, nothing happens; you keep your player. |
 | REQ-038 | not started |  |  | Newly added Phillies players become available at end of week acquired. |
-| REQ-039 | not started |  | Roster Moves | If two tied teams attempt same player, assign randomly. |
+| REQ-039 | done |  | Roster Moves | If two tied teams attempt same player, assign randomly. |
 | REQ-040 | done |  |  | No trading players between teams. |
 | REQ-041 | done |  |  | Zoom call at 6:00 PM Sunday, March 22, 2026. |
 | REQ-042 | not started |  | Auction | Each team gets $100 budget. |
@@ -67,9 +67,9 @@ Statuses: not started, in progress, done, deferred.
 | REQ-063 | done |  |  | Move the rules into the app. |
 | REQ-064 | not started |  |  | Admin panel. |
 | REQ-066 | not started |  | Website | Fix wrapping for long team names. |
-| REQ-067 | not started |  | Roster Moves | Let admins submit roster moves for all teams. |
+| REQ-067 | done |  | Roster Moves | Let admins submit roster moves for all teams. |
 | REQ-068 | not started |  | Roster Moves | Roster move testing. |
 | REQ-069 | not started |  | Roster Moves | Handle players who leave the Phillies and return in the same year. |
 | REQ-070 | not started |  | Roster Moves | Show team alumni on the team page. |
-| REQ-071 | not started |  | Admin | Add an admin account to test setup. |
+| REQ-071 | done |  | Admin | Add an admin account to test setup. |
 | REQ-065 | done |  | Website | Move lab notebook into website. |

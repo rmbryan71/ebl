@@ -170,11 +170,19 @@ a:hover {
 .team-header h2 {
   margin: 0.2rem 0 0;
   font-size: 1.2rem;
+  overflow-wrap: anywhere;
+}
+
+.team-header h2 a {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .team-name {
   font-size: clamp(3rem, 6vw, 4.5rem);
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .roster-move-button {
@@ -198,11 +206,13 @@ a:hover {
   font-size: clamp(2rem, 6vw, 3rem);
   color: var(--ink);
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .roster-request-card h2 {
   margin: 0;
   font-size: 1.3rem;
+  overflow-wrap: anywhere;
 }
 
 .roster-request-header {
@@ -683,6 +693,11 @@ a:hover {
   grid-template-columns: 1.6fr 0.4fr;
 }
 
+.season-row span:first-child,
+.season-card h3 {
+  overflow-wrap: anywhere;
+}
+
 .season-row span:nth-child(2) {
   text-align: right;
 }
@@ -778,6 +793,10 @@ a:hover {
 .leaderboard-card .stats-row {
   grid-template-columns: 1fr 90px 70px;
   gap: 0.6rem;
+}
+
+.leaderboard-card .stats-row span:first-child {
+  overflow-wrap: anywhere;
 }
 
 .leaderboard-card .stats-row span:nth-child(2) {

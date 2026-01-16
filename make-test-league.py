@@ -5,6 +5,8 @@ from werkzeug.security import generate_password_hash
 from db import get_connection, ensure_identities
 
 TEST_LEAGUE_PATH = "test-league.md"
+ADMIN_EMAIL = "admin@example.com"
+ADMIN_PASSWORD = "adminpass"
 
 
 def load_test_league_data(path=TEST_LEAGUE_PATH):
@@ -101,6 +103,21 @@ def make_test_league_and_teams(conn, team_count=8, seed=None):
             """,
             (email, password_hash, team_id),
         )
+
+    admin_hash = generate_password_hash(ADMIN_PASSWORD)
+    cursor.execute(
+        """
+        INSERT INTO user_accounts (email, password_hash, role, team_id, is_active)
+        VALUES (%s, %s, 'admin', NULL, 1)
+        ON CONFLICT (email)
+        DO UPDATE SET
+            password_hash = EXCLUDED.password_hash,
+            role = 'admin',
+            team_id = NULL,
+            is_active = 1
+        """,
+        (ADMIN_EMAIL.lower(), admin_hash),
+    )
 
     return team_ids
 
