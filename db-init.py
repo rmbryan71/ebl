@@ -209,6 +209,22 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION audit_insert_team_player() RETURNS trigger AS $$
+BEGIN
+  INSERT INTO audit (datetime, user_id, table_name, operation, new_value, prev_hash, row_hash)
+  VALUES (
+    CURRENT_TIMESTAMP,
+    COALESCE(current_setting('app.user_id', true), '0')::int,
+    'team_player',
+    'INSERT',
+    json_build_object('id', NEW.id, 'team_id', NEW.team_id, 'player_id', NEW.player_id),
+    (SELECT row_hash FROM audit ORDER BY id DESC LIMIT 1),
+    encode(gen_random_bytes(16), 'hex')
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION audit_insert_league() RETURNS trigger AS $$
 BEGIN
   INSERT INTO audit (datetime, user_id, table_name, operation, new_value, prev_hash, row_hash)
@@ -313,6 +329,7 @@ DROP TRIGGER IF EXISTS audit_points_ai ON points;
 DROP TRIGGER IF EXISTS audit_roster_move_requests_ai ON roster_move_requests;
 DROP TRIGGER IF EXISTS audit_roster_move_request_players_ai ON roster_move_request_players;
 DROP TRIGGER IF EXISTS audit_alumni_ai ON alumni;
+DROP TRIGGER IF EXISTS audit_team_player_ai ON team_player;
 
 CREATE TRIGGER audit_players_ai
 AFTER INSERT ON players
@@ -345,6 +362,10 @@ FOR EACH ROW EXECUTE FUNCTION audit_insert_roster_move_request_player();
 CREATE TRIGGER audit_alumni_ai
 AFTER INSERT ON alumni
 FOR EACH ROW EXECUTE FUNCTION audit_insert_alumni();
+
+CREATE TRIGGER audit_team_player_ai
+AFTER INSERT ON team_player
+FOR EACH ROW EXECUTE FUNCTION audit_insert_team_player();
 """
 
 
