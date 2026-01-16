@@ -36,7 +36,7 @@ Statuses: not started, in progress, done, deferred.
 | REQ-030 | not started |  | Roster Moves | Max 1 roster move attempt per week. |
 | REQ-031 | not started |  | Roster Moves | One attempt even if multiple open spots. |
 | REQ-032 | not started |  | Roster Moves | Processed Sunday night after points are awarded. |
-| REQ-033 | not started |  | Roster Moves | Each attempt includes one drop and one add. |
+| REQ-033 | not started |  | Roster Moves | A roster move attempt includes one player to drop and three prioritized players to add. |
 | REQ-034 | not started |  | Roster Moves | Cannot target a player on another team hoping they will be dropped before your turn. |
 | REQ-035 | not started |  | Roster Moves | Teams with empty roster spots go first; if multiple, lower-ranking teams go first. |
 | REQ-036 | not started |  | Roster Moves | Otherwise processed in reverse standings order; ties resolved randomly. |

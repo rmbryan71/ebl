@@ -333,6 +333,17 @@ def load_team_stats(team_id=None):
         params,
     )
     rows = cursor.fetchall()
+    for row in rows:
+        value = row["date"]
+        if isinstance(value, datetime):
+            row["date"] = value.date().strftime("%b %-d, %Y")
+        elif isinstance(value, date):
+            row["date"] = value.strftime("%b %-d, %Y")
+        else:
+            try:
+                row["date"] = datetime.strptime(value, "%Y-%m-%d").strftime("%b %-d, %Y")
+            except (TypeError, ValueError):
+                row["date"] = value
 
     cursor.execute(
         """
@@ -561,6 +572,8 @@ def load_player_details(player_id):
     if not player:
         conn.close()
         return None, [], None
+    position_name = player.get("position_name") or ""
+    player["display_position"] = "Pitcher" if position_name == "Pitcher" else "Hitter"
 
     cursor.execute(
         "SELECT MIN(date) AS first_date FROM stats WHERE player_id = %s",
@@ -593,6 +606,17 @@ def load_player_details(player_id):
             (player_id, f"{year}-%"),
         )
         stats_rows = cursor.fetchall()
+        for row in stats_rows:
+            value = row["date"]
+            if isinstance(value, datetime):
+                row["date"] = value.date().strftime("%b %-d, %Y")
+            elif isinstance(value, date):
+                row["date"] = value.strftime("%b %-d, %Y")
+            else:
+                try:
+                    row["date"] = datetime.strptime(value, "%Y-%m-%d").strftime("%b %-d, %Y")
+                except (TypeError, ValueError):
+                    row["date"] = value
 
     conn.close()
     return player, stats_rows, year
@@ -661,6 +685,9 @@ def load_available_players():
         """
     )
     rows = cursor.fetchall()
+    for row in rows:
+        position_name = row["position_name"] or ""
+        row["display_position"] = "Pitcher" if position_name == "Pitcher" else "Hitter"
     conn.close()
     return rows
 

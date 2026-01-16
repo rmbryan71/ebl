@@ -10,6 +10,10 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 4:35 PM - I've decided that sending email can wait for later. Instead of that, I'm going to work on... what exactly? Not sure. I'll start with a review of the requirements and update my lists.
 5:38 PM - I'm moving the rules and this lab notebook into the website.
 6:25 PM - Fixing links in this lab notebook. Do I want to call it "Lab Notebook" or "News"? News is shorter, I'll go with that.
+6:35 PM - Doing a prod deployment.
+6:45 PM - Deprecated and removed the EPB content from robertbryan.net as it's all on the website now.
+7:00 PM - Fixed a few little UI bugs, date display formats, added a case for players who don't have stats yet.
+7:05 PM - Fixed a few places where I was still showing player positions instead of just "Pitcher" or "Hitter".
 
 
 # January 14, 2026

@@ -36,8 +36,15 @@
         <div class="player-card">
           <h3><a href="/player?player_id={{ player.player_id }}">{{ player.player_name }}</a></h3>
           <div class="player-card-stats">
-            <span>Offense: {{ player.total_offense or 0 }}</span>
-            <span>Pitching: {{ player.total_pitching or 0 }}</span>
+            {% if player.total_offense %}
+            <span>Offense: {{ player.total_offense }}</span>
+            {% endif %}
+            {% if player.total_pitching %}
+            <span>Pitching: {{ player.total_pitching }}</span>
+            {% endif %}
+            {% if not player.total_offense and not player.total_pitching %}
+            <span>No MLB stats yet.</span>
+            {% endif %}
           </div>
         </div>
         {% endfor %}

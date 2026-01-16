@@ -43,7 +43,7 @@
               {{ row.name }}
             </a>
           </span>
-          <span data-label="Position">{{ row.position_name or "-" }}</span>
+          <span data-label="Position">{{ row.display_position or "-" }}</span>
           <span data-label="Birth date">{{ row.birth_date or "-" }}</span>
         </div>
         {% endfor %}

@@ -209,6 +209,7 @@ a:hover {
 
 .player-position {
   justify-self: end;
+  align-self: start;
   white-space: nowrap;
   color: var(--ink-soft);
   background: rgba(11, 26, 42, 0.08);
