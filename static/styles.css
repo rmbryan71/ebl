@@ -177,6 +177,23 @@ a:hover {
   margin: 0;
 }
 
+.roster-move-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+.roster-move-button:hover {
+  background: var(--accent-dark);
+}
+
 .team-meta {
   font-family: "Poppins", sans-serif;
   font-size: 0.75rem;
@@ -376,6 +393,56 @@ a:hover {
   margin: 1rem 0 0.6rem;
   font-size: 1.1rem;
   color: var(--ink);
+}
+
+.auth-card {
+  max-width: 480px;
+}
+
+.auth-form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.auth-label {
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.auth-input {
+  border: 1px solid rgba(15, 26, 44, 0.2);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  font-size: 1rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.auth-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink-soft);
+}
+
+.auth-error {
+  color: var(--accent-dark);
+  margin: 0;
+}
+
+.auth-button {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.7rem 1rem;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.auth-button:hover {
+  background: var(--accent-dark);
 }
 
 .rules-list {

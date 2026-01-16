@@ -26,6 +26,9 @@
     <header class="hero">
       <div class="hero-content">
         <h2 class="team-name">{{ selected_team_name or "" }}</h2>
+        {% if show_roster_move %}
+        <a class="roster-move-button" href="/roster-move">Roster Move</a>
+        {% endif %}
       </div>
     </header>
 

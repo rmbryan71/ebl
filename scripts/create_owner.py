@@ -1,0 +1,42 @@
+import getpass
+import os
+
+from werkzeug.security import generate_password_hash
+
+from db import get_connection
+
+
+def main():
+    if not os.getenv("DATABASE_URL"):
+        raise SystemExit("DATABASE_URL is not set.")
+
+    email = input("Owner email: ").strip().lower()
+    if not email:
+        raise SystemExit("Email is required.")
+    password = getpass.getpass("Owner password: ").strip()
+    if not password:
+        raise SystemExit("Password is required.")
+
+    password_hash = generate_password_hash(password)
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO user_accounts (email, password_hash, role, is_active)
+                VALUES (%s, %s, 'owner', 1)
+                ON CONFLICT (email)
+                DO UPDATE SET
+                    password_hash = EXCLUDED.password_hash,
+                    role = 'owner',
+                    is_active = 1
+                """,
+                (email, password_hash),
+            )
+        conn.commit()
+
+    print("Owner account created/updated.")
+
+
+if __name__ == "__main__":
+    main()

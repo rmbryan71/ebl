@@ -4,13 +4,29 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+from functools import wraps
 import time
 
 from flask import Flask, abort, redirect, render_template, request
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    current_user,
+    login_required,
+    login_user,
+    logout_user,
+)
+from werkzeug.security import check_password_hash
 
 from db import get_connection
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret")
+app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=30)
+
+login_manager = LoginManager()
+login_manager.login_view = "login_view"
+login_manager.init_app(app)
 
 RATE_LIMITS = {
     "default": (120, 60),
@@ -407,6 +423,11 @@ def team_stats():
     teams, selected_team_id, selected_team_name, rows, totals, player_totals = load_team_stats(
         team_id=team_id
     )
+    show_roster_move = (
+        current_user.is_authenticated
+        and current_user.role == "owner"
+        and current_user.team_id == selected_team_id
+    )
     return render_template(
         "team-stats.html",
         teams=teams,
@@ -415,6 +436,7 @@ def team_stats():
         rows=rows,
         totals=totals,
         player_totals=player_totals,
+        show_roster_move=show_roster_move,
     )
 
 
@@ -723,6 +745,8 @@ def load_audit(page, page_size=50):
 
 
 @app.route("/audit")
+@login_required
+@owner_or_admin_required
 def audit_view():
     page = request.args.get("page", type=int) or 1
     if page < 1:
@@ -734,6 +758,56 @@ def audit_view():
         page=page,
         total_pages=total_pages,
     )
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login_view():
+    error = None
+    if request.method == "POST":
+        email = (request.form.get("email") or "").strip().lower()
+        password = request.form.get("password") or ""
+        remember = bool(request.form.get("remember"))
+        if email and password:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT id, email, password_hash, role, team_id, is_active
+                FROM user_accounts
+                WHERE email = %s
+                """,
+                (email,),
+            )
+            row = cursor.fetchone()
+            conn.close()
+            if row and row["is_active"] and check_password_hash(row["password_hash"], password):
+                login_user(
+                    AuthUser(
+                        row["id"],
+                        row["email"],
+                        row["role"],
+                        row["team_id"],
+                        row["is_active"],
+                    ),
+                    remember=remember,
+                )
+                return redirect(request.args.get("next") or "/")
+        error = "Invalid email or password."
+    return render_template("login.html", error=error)
+
+
+@app.route("/logout")
+@login_required
+def logout_view():
+    logout_user()
+    return redirect("/")
+
+
+@app.route("/roster-move")
+@login_required
+@owner_or_admin_required
+def roster_move_view():
+    return render_template("roster-move.html")
 
 
 @app.route("/rules")
@@ -752,3 +826,45 @@ def news_view():
 
 if __name__ == "__main__":
     app.run(debug=False)
+class AuthUser(UserMixin):
+    def __init__(self, user_id, email, role, team_id=None, is_active=True):
+        self.id = user_id
+        self.email = email
+        self.role = role
+        self.team_id = team_id
+        self.active = bool(is_active)
+
+    @property
+    def is_active(self):
+        return self.active
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT id, email, role, team_id, is_active
+        FROM user_accounts
+        WHERE id = %s
+        """,
+        (user_id,),
+    )
+    row = cursor.fetchone()
+    conn.close()
+    if not row:
+        return None
+    return AuthUser(row["id"], row["email"], row["role"], row["team_id"], row["is_active"])
+
+
+def owner_or_admin_required(view_func):
+    @wraps(view_func)
+    def wrapper(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return login_manager.unauthorized()
+        if current_user.role not in {"admin", "owner"}:
+            abort(403)
+        return view_func(*args, **kwargs)
+
+    return wrapper

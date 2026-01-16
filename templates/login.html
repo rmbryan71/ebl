@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EBL Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <div class="backdrop"></div>
+    <nav class="top-nav">
+      <a href="/">Home</a>
+      <a href="/week">Weekly Standings</a>
+      <a href="/season">Season Standings</a>
+      <a href="/available">Available Players</a>
+      <a href="/audit">Audit</a>
+      <a href="/rules" class="nav-rules">Rules</a>
+      <a href="/news" class="nav-news">News</a>
+    </nav>
+    <nav class="bottom-nav">
+      <a href="/">Home</a>
+      <a href="/week">Week</a>
+      <a href="/season">Season</a>
+      <a href="/news">News</a>
+    </nav>
+    <header class="hero">
+      <div class="hero-content">
+        <h1 class="league-title league-title--small">Admin Login</h1>
+      </div>
+    </header>
+
+    <main class="rules-page">
+      <section class="rules-card auth-card">
+        <form class="auth-form" method="post">
+          <label class="auth-label" for="email">Email</label>
+          <input class="auth-input" id="email" name="email" type="email" required />
+
+          <label class="auth-label" for="password">Password</label>
+          <input class="auth-input" id="password" name="password" type="password" required />
+
+          <label class="auth-checkbox">
+            <input type="checkbox" name="remember" />
+            Remember me
+          </label>
+
+          {% if error %}
+          <p class="auth-error">{{ error }}</p>
+          {% endif %}
+
+          <button class="auth-button" type="submit">Sign in</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

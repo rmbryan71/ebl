@@ -14,6 +14,7 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 6:45 PM - Deprecated and removed the EPB content from robertbryan.net as it's all on the website now.
 7:00 PM - Fixed a few little UI bugs, date display formats, added a case for players who don't have stats yet.
 7:05 PM - Fixed a few places where I was still showing player positions instead of just "Pitcher" or "Hitter".
+7:06 PM - Digging in to implementing user accounts, authentication, and logins. Almost everything on the site is going to be available to the public without login. You only need to log in to see the audit trail and to create roster move requests.
 
 
 # January 14, 2026
@@ -23,8 +24,6 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 3. Database persistence - done
 4. Load 2025 season data into prod - done
 5. Web view of audit trail - done
-
-
 
 6:05 PM - I'm satisfied with the web app overhaul to make it cell friendly.  
 6:35 PM - In the future, should remember to put the server in maintenance mode before pushing experimental code.  

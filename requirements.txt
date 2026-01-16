@@ -4,3 +4,4 @@ psycopg[binary]==3.3.2
 requests==2.32.3
 pymlb-statsapi==1.4.3
 Markdown==3.6
+Flask-Login==0.6.3
