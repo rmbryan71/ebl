@@ -58,15 +58,15 @@ Statuses: not started, in progress, done, deferred.
 | REQ-053 | done |  |  | Player ownership is for 2026 season only. |
 | REQ-054 | done |  |  | No requirement to reveal identity to participate. |
 | REQ-055 | not started |  |  | All data must be anonymized and free of personally identifiable information. |
-| REQ-056 | not started |  |  | Detailed, immutable audit trail for roster move attempts, stat updates, point awards, data corrections, and later logins/anonymized owner actions. |
-| REQ-057 | not started |  |  | Audit trail must be available to everyone at all times. |
+| REQ-056 | done |  |  | Detailed, immutable audit trail for roster move attempts, stat updates, point awards, data corrections, and later logins/anonymized owner actions. |
+| REQ-057 | done |  |  | Audit trail must be available to everyone at all times. |
 | REQ-058 | not started |  |  | Provide a health check/status page. |
-| REQ-059 | not started |  |  | Improve data persistence for deployments. |
+| REQ-059 | done |  |  | Improve data persistence for deployments. |
 | REQ-060 | not started |  |  | User accounts. |
 | REQ-061 | not started |  |  | Authentication. |
 | REQ-063 | done |  |  | Move the rules into the app. |
 | REQ-064 | not started |  |  | Admin panel. |
-| REQ-066 | not started |  | Website | Fix wrapping for long team names. |
+| REQ-066 | done |  | Website | Fix wrapping for long team names. |
 | REQ-067 | done |  | Roster Moves | Let admins submit roster moves for all teams. |
 | REQ-068 | not started |  | Roster Moves | Roster move testing. |
 | REQ-069 | not started |  | Roster Moves | Handle players who leave the Phillies and return in the same year. |

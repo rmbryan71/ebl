@@ -86,11 +86,11 @@ def write_roster_fixture(out_dir, fixture_date):
     )
     roster_json = roster_resp.json()
     roster_rows = roster_json.get("roster", [])
-    mlb_ids = [str(row["person"]["id"]) for row in roster_rows]
+    mlb_ids = [int(row["person"]["id"]) for row in roster_rows]
     people = []
-    if mlb_ids:
-        person_resp = api.Person.person(personIds=mlb_ids)
-        people = person_resp.json().get("people", [])
+    for mlb_id in mlb_ids:
+        person_resp = api.Person.person(personIds=mlb_id)
+        people.extend(person_resp.json().get("people", []))
     payload = {"roster": roster_rows, "people": people}
     out_path = out_dir / "roster" / f"{fixture_date.isoformat()}.json"
     out_path.parent.mkdir(parents=True, exist_ok=True)

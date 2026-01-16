@@ -683,6 +683,19 @@ def login_view():
                 (email,),
             )
             row = cursor.fetchone()
+            if row and row["is_active"] and check_password_hash(row["password_hash"], password):
+                cursor.execute(
+                    """
+                    INSERT INTO user_login_history (user_id, ip_address, user_agent)
+                    VALUES (%s, %s, %s)
+                    """,
+                    (
+                        row["id"],
+                        request.headers.get("X-Forwarded-For", request.remote_addr),
+                        request.headers.get("User-Agent"),
+                    ),
+                )
+                conn.commit()
             conn.close()
             if row and row["is_active"] and check_password_hash(row["password_hash"], password):
                 login_user(
@@ -705,6 +718,32 @@ def login_view():
 def logout_view():
     logout_user()
     return redirect("/")
+
+
+@app.route("/profile")
+@login_required
+def profile_view():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT logged_in_at, ip_address, user_agent
+        FROM user_login_history
+        WHERE user_id = %s
+        ORDER BY logged_in_at DESC
+        LIMIT 50
+        """,
+        (current_user.id,),
+    )
+    rows = cursor.fetchall()
+    conn.close()
+    for row in rows:
+        value = row["logged_in_at"]
+        if isinstance(value, datetime):
+            row["logged_in_display"] = value.strftime("%b %-d, %Y %I:%M %p")
+        else:
+            row["logged_in_display"] = value
+    return render_template("profile.html", rows=rows)
 
 
 @app.route("/roster-move", methods=["GET", "POST"])

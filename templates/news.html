@@ -13,14 +13,26 @@
       <a href="/week">Weekly Standings</a>
       <a href="/season">Season Standings</a>
       <a href="/available">Available Players</a>
+      {% if current_user.is_authenticated %}
       <a href="/audit">Audit</a>
+      {% if current_user.role in ["admin", "owner"] %}
+      <a href="/pending-roster-moves" class="nav-admin">Pending Roster Moves</a>
+      {% endif %}
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
+      <a href="/logout" class="nav-logout">Logout</a>
+      <a href="/profile" class="nav-user">{{ current_user.email }}</a>
+      {% else %}
+      <a href="/rules" class="nav-rules">Rules</a>
+      <a href="/news" class="nav-news">News</a>
+      <a href="/login" class="nav-login">Login</a>
+      {% endif %}
     </nav>
     <nav class="bottom-nav">
       <a href="/">Home</a>
       <a href="/week">Week</a>
       <a href="/season">Season</a>
+      <a href="/news">News</a>
     </nav>
     <header class="hero rules-hero">
       <div class="hero-content">
@@ -36,6 +48,9 @@
       <section class="rules-card">
         <h2>January 16, 2026</h2>
         <div class="news-paragraph"><p>2:40 AM - As I work, I have ideas for other projects that I want to do after the Experimental Baseball League is up and running. Currently, that's motivating me to work a lot. This morning, I'm going to focus on implementing the rest of the roster move process, then automated testing.</p></div>
+<div class="news-paragraph"><p>4:00 AM - I have a start on code to handle when players leave the MLB Phillies. Also, I have test data setup that creates user accounts for 8 team owners, and opens a browser window for each owner, logged in as that owner, navigated to their team page so that I can start testing roster moves. Next, I need to step through the 2025 season one week at a time write test scripts to handle MLB roster changes, EBL roster changes, open roster spots and the roster move request process.</p></div>
+<div class="news-paragraph"><p>5:15 AM - Progress on the handling of roster moves. Added a testing for roster move changes. Made a set of scripts to step through the 2025 season day by day and test roster moves and stats. Overhauled the league rules on roster moves.</p></div>
+<div class="news-paragraph"><p>3:30 PM - Automating testing.</p></div>
       </section>
       <section class="rules-card">
         <h2>January 15, 2026</h2>

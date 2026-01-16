@@ -44,6 +44,7 @@ a:hover {
   text-transform: uppercase;
   letter-spacing: 0.12em;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .top-nav a {
@@ -53,6 +54,16 @@ a:hover {
 
 .top-nav a:hover {
   color: #082655;
+}
+
+.top-nav .nav-user {
+  margin-left: auto;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--ink-soft);
+  white-space: nowrap;
 }
 
 .bottom-nav {

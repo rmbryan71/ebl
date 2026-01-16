@@ -126,14 +126,26 @@ def build_news_page(sections):
       <a href="/week">Weekly Standings</a>
       <a href="/season">Season Standings</a>
       <a href="/available">Available Players</a>
+      {{% if current_user.is_authenticated %}}
       <a href="/audit">Audit</a>
+      {{% if current_user.role in ["admin", "owner"] %}}
+      <a href="/pending-roster-moves" class="nav-admin">Pending Roster Moves</a>
+      {{% endif %}}
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
+      <a href="/logout" class="nav-logout">Logout</a>
+      <a href="/profile" class="nav-user">{{{{ current_user.email }}}}</a>
+      {{% else %}}
+      <a href="/rules" class="nav-rules">Rules</a>
+      <a href="/news" class="nav-news">News</a>
+      <a href="/login" class="nav-login">Login</a>
+      {{% endif %}}
     </nav>
     <nav class="bottom-nav">
       <a href="/">Home</a>
       <a href="/week">Week</a>
       <a href="/season">Season</a>
+      <a href="/news">News</a>
     </nav>
     <header class="hero rules-hero">
       <div class="hero-content">
