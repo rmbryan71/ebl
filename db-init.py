@@ -299,6 +299,9 @@ DROP TRIGGER IF EXISTS audit_teams_ai ON teams;
 DROP TRIGGER IF EXISTS audit_leagues_ai ON leagues;
 DROP TRIGGER IF EXISTS audit_stats_ai ON stats;
 DROP TRIGGER IF EXISTS audit_points_ai ON points;
+DROP TRIGGER IF EXISTS audit_roster_move_requests_ai ON roster_move_requests;
+DROP TRIGGER IF EXISTS audit_roster_move_request_players_ai ON roster_move_request_players;
+DROP TRIGGER IF EXISTS audit_alumni_ai ON alumni;
 
 CREATE TRIGGER audit_players_ai
 AFTER INSERT ON players
