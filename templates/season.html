@@ -14,11 +14,14 @@
       <a href="/season">Season Standings</a>
       <a href="/available">Available Players</a>
       <a href="/audit">Audit</a>
-      {% if current_user.is_authenticated and current_user.role == "admin" %}
+      {% if current_user.is_authenticated and current_user.role in ["admin", "owner"] %}
       <a href="/pending-roster-moves" class="nav-admin">Pending Roster Moves</a>
       {% endif %}
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
+      {% if current_user.is_authenticated %}
+      <a href="/logout" class="nav-logout">Logout</a>
+      {% endif %}
     </nav>
     <nav class="bottom-nav">
       <a href="/">Home</a>

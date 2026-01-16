@@ -1,11 +1,12 @@
 from collections import defaultdict, deque
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 import os
 from pathlib import Path
 import subprocess
 import sys
 from functools import wraps
 import time
+from zoneinfo import ZoneInfo
 
 from flask import Flask, abort, redirect, render_template, request
 from flask_login import (
@@ -90,6 +91,7 @@ RATE_LIMITS = {
 REQUEST_HISTORY = defaultdict(deque)
 ENFORCE_HTTPS = os.getenv("FORCE_HTTPS", "").lower() in {"1", "true", "yes"}
 AUTO_BUILD_NEWS = os.getenv("AUTO_BUILD_NEWS", "").lower() in {"1", "true", "yes"}
+EASTERN_TZ = ZoneInfo("America/New_York")
 
 RULES_CHANGELOG = [
     {
@@ -284,9 +286,9 @@ def enforce_https_and_rate_limit():
 
 
 def should_build_news():
-    if os.getenv("RENDER") or os.getenv("RENDER_SERVICE_ID") or os.getenv("RENDER_INSTANCE_ID"):
+    if os.getenv("DISABLE_NEWS_BUILD", "").lower() in {"1", "true", "yes"}:
         return False
-    return AUTO_BUILD_NEWS or os.getenv("FLASK_ENV") == "development"
+    return True
 
 
 NEWS_BUILT = False
@@ -949,7 +951,7 @@ def roster_move_view():
                     "DELETE FROM roster_move_requests WHERE team_id = %s AND status = 'pending'",
                     (team_id,),
                 )
-                submitted_at = datetime.now(timezone.utc).isoformat(sep=" ")
+                submitted_at = datetime.now(EASTERN_TZ).replace(tzinfo=None).isoformat(sep=" ")
                 cursor.execute(
                     """
                     INSERT INTO roster_move_requests (team_id, submitted, status)
@@ -998,18 +1000,26 @@ def roster_move_view():
 
 @app.route("/pending-roster-moves")
 @login_required
-@admin_required
+@owner_or_admin_required
 def pending_roster_moves_view():
+    if current_user.role == "owner" and current_user.team_id:
+        team_filter = "AND r.team_id = %s"
+        params = [current_user.team_id]
+    else:
+        team_filter = ""
+        params = []
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute(
-        """
+        f"""
         SELECT r.id, r.team_id, r.submitted, t.name AS team_name
         FROM roster_move_requests r
         JOIN teams t ON t.id = r.team_id
         WHERE r.status = 'pending'
+        {team_filter}
         ORDER BY r.submitted DESC
-        """
+        """,
+        params,
     )
     requests = cursor.fetchall()
     request_ids = [row["id"] for row in requests]
