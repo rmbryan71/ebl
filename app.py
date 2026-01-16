@@ -937,39 +937,53 @@ def roster_move_view():
         else:
             try:
                 set_audit_user_id(conn, current_user.id)
+                if current_user.role == "owner":
+                    submitted_at = datetime.now(EASTERN_TZ).replace(tzinfo=None)
+                    week_start = submitted_at.date() - timedelta(days=submitted_at.date().weekday())
+                    week_start_dt = datetime.combine(week_start, datetime.min.time())
+                    week_end_dt = week_start_dt + timedelta(days=7)
+                    cursor.execute(
+                        """
+                        SELECT COUNT(*) AS count
+                        FROM roster_move_requests
+                        WHERE team_id = %s
+                          AND submitted >= %s
+                          AND submitted < %s
+                        """,
+                        (team_id, week_start_dt, week_end_dt),
+                    )
+                    if cursor.fetchone()["count"] >= 50:
+                        error = "You have reached your limit of 50 roster move requests per week."
+                if error:
+                    conn.rollback()
+                else:
                 cursor.execute(
                     """
-                    DELETE FROM roster_move_request_players
-                    WHERE roster_move_request_id IN (
-                        SELECT id FROM roster_move_requests
-                        WHERE team_id = %s AND status = 'pending'
-                    )
+                    UPDATE roster_move_requests
+                    SET status = 'superseded'
+                    WHERE team_id = %s AND status = 'pending'
                     """,
                     (team_id,),
                 )
-                cursor.execute(
-                    "DELETE FROM roster_move_requests WHERE team_id = %s AND status = 'pending'",
-                    (team_id,),
-                )
-                submitted_at = datetime.now(EASTERN_TZ).replace(tzinfo=None).isoformat(sep=" ")
-                cursor.execute(
+                    submitted_at = datetime.now(EASTERN_TZ).replace(tzinfo=None).isoformat(sep=" ")
+                    cursor.execute(
                     """
                     INSERT INTO roster_move_requests (team_id, submitted, status)
                     VALUES (%s, %s, 'pending')
                     RETURNING id
                     """,
                     (team_id, submitted_at),
-                )
-                request_id = cursor.fetchone()["id"]
-                cursor.execute(
+                    )
+                    request_id = cursor.fetchone()["id"]
+                    cursor.execute(
                     """
                     INSERT INTO roster_move_request_players (roster_move_request_id, player_id, action)
                     VALUES (%s, %s, 'drop')
                     """,
                     (request_id, drop_player_id),
-                )
-                for priority in sorted(choice_map.keys()):
-                    cursor.execute(
+                    )
+                    for priority in sorted(choice_map.keys()):
+                        cursor.execute(
                         """
                         INSERT INTO roster_move_request_players (
                             roster_move_request_id,
@@ -980,9 +994,9 @@ def roster_move_view():
                         VALUES (%s, %s, 'add', %s)
                         """,
                         (request_id, choice_map[priority], priority),
-                    )
-                conn.commit()
-                success = "Roster move submitted."
+                        )
+                    conn.commit()
+                    success = "Roster move submitted."
             except Exception:
                 conn.rollback()
                 raise

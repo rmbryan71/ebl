@@ -15,7 +15,7 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 7:00 PM - Fixed a few little UI bugs, date display formats, added a case for players who don't have stats yet.
 7:05 PM - Fixed a few places where I was still showing player positions instead of just "Pitcher" or "Hitter".
 7:06 PM - Digging in to implementing user accounts, authentication, and logins. Almost everything on the site is going to be available to the public without login. You only need to log in to see the audit trail and to create roster move requests.
-
+9:15 PM - Creating owner and admin accounts is done manually with scripts. Assigning owners to teams is a script. When a logged-in owner is on the team page for the team they own, they see a roster move button. That button opens a form where they choose the player they want to drop from their team and their first, second, and third choices for available players to add. Owners can see their pending roster move request after they submit it. If they don't like it or change their mind, they can just submit another roster move request and the old request is superseded. The new request is pending. Owners are limited to 50 roster move attempt requests per week.
 
 # January 14, 2026
 4:30 PM - This is my list of things I want to work on in rough priority order:
