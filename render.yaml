@@ -9,6 +9,13 @@ services:
         value: America/New_York
 
 cronjobs:
+  - name: nightly-roster-sync
+    schedule: "0 3 * * *"
+    env: python
+    command: python roster-sync.py
+    envVars:
+      - key: TZ
+        value: America/New_York
   - name: weekly-scoring
     schedule: "0 4 * * 0"
     env: python

@@ -1,57 +1,55 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
+import json
+
+import requests
 from pymlb_statsapi import api
 
 from db import get_connection, ensure_identities
 
 PHILLIES_TEAM_ID = 143
+TRANSACTION_ADD_PATTERNS = (
+    "added to 40-man roster",
+    "selected from",
+    "signed and added to 40-man roster",
+)
+TRANSACTION_REMOVE_PATTERNS = (
+    "designated for assignment",
+    "outrighted",
+    "released",
+    "traded",
+    "claimed off waivers",
+    "removed from 40-man roster",
+)
 
 
-def sync_phillies_40_man(roster_date=None):
-    conn = get_connection()
-    cursor = conn.cursor()
-    ensure_identities(conn, ["players"])
+def transaction_matches(patterns, description):
+    if not description:
+        return False
+    lowered = description.lower()
+    return any(pattern in lowered for pattern in patterns)
 
-    # Track active MLB IDs this sync
-    active_mlb_ids = set()
 
-    # -------------------------
-    # 1. Fetch 40-man roster
-    # -------------------------
-    roster_params = {
+def fetch_transactions(start_date, end_date):
+    params = {
         "teamId": PHILLIES_TEAM_ID,
-        "rosterType": "40Man",
+        "startDate": start_date.isoformat(),
+        "endDate": end_date.isoformat(),
     }
-    if roster_date:
-        roster_params["date"] = roster_date
-    roster_resp = api.Team.roster(**roster_params)
-    roster_json = roster_resp.json()
-    roster_rows = roster_json.get("roster", [])
-    people_map = {}
+    response = requests.get(
+        "https://statsapi.mlb.com/api/v1/transactions",
+        params=params,
+        timeout=30,
+    )
+    response.raise_for_status()
+    return response.json().get("transactions", [])
 
-    # -------------------------
-    # 2. Process each player
-    # -------------------------
-    for r in roster_rows:
-        mlb_id = int(r["person"]["id"])
-        active_mlb_ids.add(mlb_id)
 
-        # Fetch full player record
-        person = people_map.get(mlb_id)
-        if person is None:
-            person_resp = api.Person.person(personIds=[mlb_id])
-            person = person_resp.json()["people"][0]
-
-        # Parse fields
-        first_name = person.get("firstName")
-        last_name = person.get("lastName")
-        name = person.get("fullName")
-        name_slug = person.get("nameSlug")
-
-        position = person.get("primaryPosition", {})
-        bat_side = person.get("batSide", {})
-        throw_side = person.get("pitchHand", {})
-
-        cursor.execute("""
+def upsert_player(cursor, person):
+    position = person.get("primaryPosition", {})
+    bat_side = person.get("batSide", {})
+    throw_side = person.get("pitchHand", {})
+    cursor.execute(
+        """
         INSERT INTO players (
             mlb_id,
             name,
@@ -97,12 +95,13 @@ def sync_phillies_40_man(roster_date=None):
             weight            = excluded.weight,
             is_active         = 1,
             last_updated      = excluded.last_updated;
-        """, (
-            mlb_id,
-            name,
-            first_name,
-            last_name,
-            name_slug,
+        """,
+        (
+            int(person["id"]),
+            person.get("fullName"),
+            person.get("firstName"),
+            person.get("lastName"),
+            person.get("nameSlug"),
             position.get("code"),
             position.get("name"),
             position.get("type"),
@@ -116,67 +115,133 @@ def sync_phillies_40_man(roster_date=None):
             person.get("birthCountry"),
             person.get("height"),
             int(person["weight"]) if person.get("weight") else None,
-            datetime.now(timezone.utc).isoformat(sep=" ")
-        ))
+            datetime.now(timezone.utc).isoformat(sep=" "),
+        ),
+    )
 
-    # -------------------------
-    # 3. Deactivate removed players
-    # -------------------------
-    if active_mlb_ids:
-        placeholders = ",".join(["%s"] * len(active_mlb_ids))
-        deactivated_at = datetime.now(timezone.utc).isoformat(sep=" ")
+
+def deactivate_player(cursor, player_id, deactivated_at):
+    cursor.execute(
+        """
+        UPDATE players
+        SET is_active = 0,
+            last_updated = %s
+        WHERE id = %s
+          AND is_active = 1
+        """,
+        (deactivated_at, player_id),
+    )
+    cursor.execute(
+        "SELECT player_id, team_id FROM team_player WHERE player_id = %s",
+        (player_id,),
+    )
+    assignments = cursor.fetchall()
+    if assignments:
+        cursor.executemany(
+            """
+            INSERT INTO alumni (player_id, team_id, deactivated_at)
+            VALUES (%s, %s, %s)
+            """,
+            [
+                (row["player_id"], row["team_id"], deactivated_at)
+                for row in assignments
+            ],
+        )
+    cursor.execute(
+        """
+        UPDATE teams
+        SET has_empty_roster_spot = 1
+        WHERE id IN (
+            SELECT team_id
+            FROM team_player
+            WHERE player_id = %s
+        )
+        """,
+        (player_id,),
+    )
+    cursor.execute(
+        "DELETE FROM team_player WHERE player_id = %s",
+        (player_id,),
+    )
+
+
+def sync_phillies_40_man(end_date=None, window_days=7):
+    conn = get_connection()
+    cursor = conn.cursor()
+    ensure_identities(conn, ["players", "mlb_transactions"])
+
+    end_day = end_date or date.today()
+    start_day = end_day - timedelta(days=window_days - 1)
+    transactions = fetch_transactions(start_day, end_day)
+    processed = 0
+
+    for txn in transactions:
+        txn_id = txn.get("transactionId") or txn.get("id")
+        if not txn_id:
+            continue
+        txn_id = str(txn_id)
+        person = txn.get("person") or {}
+        player_mlb_id = person.get("id")
+        description = txn.get("description", "")
+        type_desc = txn.get("typeDesc", "")
+        type_code = txn.get("typeCode", "")
+        transaction_date = txn.get("date") or txn.get("transactionDate")
+        effective_date = txn.get("effectiveDate")
         cursor.execute(
-            f"""
-            UPDATE players
-            SET is_active = 0,
-                last_updated = %s
-            WHERE is_active = 1
-              AND mlb_id NOT IN ({placeholders})
+            """
+            INSERT INTO mlb_transactions (
+                mlb_transaction_id,
+                player_mlb_id,
+                player_name,
+                transaction_date,
+                effective_date,
+                type_code,
+                type_desc,
+                description,
+                raw_payload
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb)
+            ON CONFLICT (mlb_transaction_id) DO NOTHING
             RETURNING id
             """,
-            (deactivated_at, *active_mlb_ids),
+            (
+                txn_id,
+                int(player_mlb_id) if player_mlb_id else None,
+                person.get("fullName"),
+                transaction_date,
+                effective_date,
+                type_code,
+                type_desc,
+                description,
+                json.dumps(txn),
+            ),
         )
-        removed_player_ids = [row["id"] for row in cursor.fetchall()]
-        if removed_player_ids:
-            removed_placeholders = ",".join(["%s"] * len(removed_player_ids))
+        inserted = cursor.fetchone()
+        if not inserted:
+            continue
+        processed += 1
+        if not player_mlb_id:
+            continue
+        player_mlb_id = int(player_mlb_id)
+        person_resp = api.Person.person(personIds=player_mlb_id)
+        person_data = person_resp.json().get("people", [])
+        if person_data:
+            upsert_player(cursor, person_data[0])
+
+        if transaction_matches(TRANSACTION_REMOVE_PATTERNS, description) or transaction_matches(
+            TRANSACTION_REMOVE_PATTERNS, type_desc
+        ):
+            cursor.execute("SELECT id FROM players WHERE mlb_id = %s", (player_mlb_id,))
+            row = cursor.fetchone()
+            if row:
+                deactivate_player(cursor, row["id"], datetime.now(timezone.utc).isoformat(sep=" "))
+
+        if transaction_matches(TRANSACTION_ADD_PATTERNS, description) or transaction_matches(
+            TRANSACTION_ADD_PATTERNS, type_desc
+        ):
             cursor.execute(
-                f"""
-                SELECT player_id, team_id
-                FROM team_player
-                WHERE player_id IN ({removed_placeholders})
-                """,
-                removed_player_ids,
-            )
-            assignments = cursor.fetchall()
-            if assignments:
-                cursor.executemany(
-                    """
-                    INSERT INTO alumni (player_id, team_id, deactivated_at)
-                    VALUES (%s, %s, %s)
-                    """,
-                    [
-                        (row["player_id"], row["team_id"], deactivated_at)
-                        for row in assignments
-                    ],
-                )
-            cursor.execute(
-                f"""
-                UPDATE teams
-                SET has_empty_roster_spot = 1
-                WHERE id IN (
-                    SELECT team_id
-                    FROM team_player
-                    WHERE player_id IN ({removed_placeholders})
-                )
-                """,
-                removed_player_ids,
-            )
-            cursor.execute(
-                f"""
-                DELETE FROM team_player
-                WHERE player_id IN ({removed_placeholders})
-                """,
-                removed_player_ids,
+                "UPDATE players SET is_active = 1 WHERE mlb_id = %s",
+                (player_mlb_id,),
             )
 
     cursor.execute(
@@ -205,19 +270,20 @@ def sync_phillies_40_man(roster_date=None):
     conn.commit()
     conn.close()
 
-    print(f"Roster sync complete: {len(active_mlb_ids)} active players.")
+    print(
+        f"Transactions sync complete: {processed} new transactions from "
+        f"{start_day.isoformat()} to {end_day.isoformat()}."
+    )
+
 
 if __name__ == "__main__":
-    roster_date = None
-    while True:
-        roster_input = input("Roster date (YYYY-MM-DD, blank for today): ").strip()
-        if not roster_input:
-            break
+    window_input = input("Window days (default 7): ").strip()
+    end_input = input("End date (YYYY-MM-DD, blank for today): ").strip()
+    window_days = int(window_input) if window_input else 7
+    end_date = None
+    if end_input:
         try:
-            datetime.strptime(roster_input, "%Y-%m-%d")
-        except ValueError:
-            print("Invalid date format. Use YYYY-MM-DD.")
-            continue
-        roster_date = roster_input
-        break
-    sync_phillies_40_man(roster_date=roster_date)
+            end_date = datetime.strptime(end_input, "%Y-%m-%d").date()
+        except ValueError as exc:
+            raise SystemExit("Invalid date format. Use YYYY-MM-DD.") from exc
+    sync_phillies_40_man(end_date=end_date, window_days=window_days)
