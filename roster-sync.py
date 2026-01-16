@@ -120,15 +120,53 @@ def sync_phillies_40_man(roster_date=None):
     # -------------------------
     if active_mlb_ids:
         placeholders = ",".join(["%s"] * len(active_mlb_ids))
+        deactivated_at = datetime.now(timezone.utc).isoformat(sep=" ")
         cursor.execute(
             f"""
             UPDATE players
             SET is_active = 0,
                 last_updated = %s
-            WHERE mlb_id NOT IN ({placeholders})
+            WHERE is_active = 1
+              AND mlb_id NOT IN ({placeholders})
+            RETURNING id
             """,
-            (datetime.now(timezone.utc).isoformat(sep=" "), *active_mlb_ids),
+            (deactivated_at, *active_mlb_ids),
         )
+        removed_player_ids = [row["id"] for row in cursor.fetchall()]
+        if removed_player_ids:
+            removed_placeholders = ",".join(["%s"] * len(removed_player_ids))
+            cursor.execute(
+                f"""
+                SELECT player_id, team_id
+                FROM team_player
+                WHERE player_id IN ({removed_placeholders})
+                """,
+                removed_player_ids,
+            )
+            assignments = cursor.fetchall()
+            if assignments:
+                cursor.executemany(
+                    """
+                    INSERT INTO alumni (player_id, team_id, deactivated_at)
+                    VALUES (%s, %s, %s)
+                    """,
+                    [
+                        (row["player_id"], row["team_id"], deactivated_at)
+                        for row in assignments
+                    ],
+                )
+            cursor.execute(
+                f"""
+                UPDATE teams
+                SET has_empty_roster_spot = 1
+                WHERE id IN (
+                    SELECT team_id
+                    FROM team_player
+                    WHERE player_id IN ({removed_placeholders})
+                )
+                """,
+                removed_player_ids,
+            )
 
     conn.commit()
     conn.close()

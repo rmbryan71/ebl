@@ -69,4 +69,6 @@ Statuses: not started, in progress, done, deferred.
 | REQ-066 | not started |  | Website | Fix wrapping for long team names. |
 | REQ-067 | not started |  | Roster Moves | Let admins submit roster moves for all teams. |
 | REQ-068 | not started |  | Roster Moves | Roster move testing. |
+| REQ-069 | not started |  | Roster Moves | Handle players who leave the Phillies and return in the same year. |
+| REQ-070 | not started |  | Roster Moves | Show team alumni on the team page. |
 | REQ-065 | done |  | Website | Move lab notebook into website. |

@@ -120,9 +120,6 @@ def assign_players_to_teams(conn, team_ids, force=False, seed=None, max_per_team
     if not player_ids:
         return 0
 
-    rng = random.Random(seed)
-    rng.shuffle(player_ids)
-
     rows = []
     assignments = {team_id: 0 for team_id in team_ids}
     team_cycle = list(team_ids)
