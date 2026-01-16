@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import time
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -68,8 +69,12 @@ def main():
             page.evaluate(f"document.title = 'EBL {safe_name}'")
             contexts.append(context)
 
-        print("Launched sessions for all teams. Close the browser to exit.")
-        browser.wait_for_event("disconnected")
+        print("Launched sessions for all teams. Press Ctrl+C to close.")
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            return
 
 
 if __name__ == "__main__":
