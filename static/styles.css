@@ -420,6 +420,12 @@ a:hover {
   color: var(--ink);
 }
 
+.rules-card h4 {
+  margin: 0.9rem 0 0.5rem;
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+
 .auth-card {
   max-width: 480px;
 }
@@ -515,6 +521,12 @@ a:hover {
   grid-template-columns: 1fr auto auto;
 }
 
+.roster-move-note {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
 .roster-move-name {
   font-weight: 600;
 }
@@ -559,6 +571,48 @@ a:hover {
   padding-left: 1.4rem;
   color: var(--ink-soft);
   line-height: 1.6;
+}
+
+.rules-paragraph {
+  margin: 0.6rem 0 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.rules-markdown h1 {
+  font-size: 1.8rem;
+  margin: 0 0 0.8rem;
+  color: var(--ink);
+}
+
+.rules-markdown h2 {
+  font-size: 1.4rem;
+  margin: 1.2rem 0 0.8rem;
+  color: var(--ink);
+}
+
+.rules-markdown h3 {
+  font-size: 1.1rem;
+  margin: 1rem 0 0.6rem;
+  color: var(--ink);
+}
+
+.rules-markdown p {
+  margin: 0.6rem 0 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.rules-markdown ul,
+.rules-markdown ol {
+  margin: 0.4rem 0 0.8rem;
+  padding-left: 1.4rem;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.rules-markdown li {
+  margin: 0.35rem 0;
 }
 
 .rules-list li {

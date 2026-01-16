@@ -183,26 +183,29 @@ def main():
             log_entries.append(f"## {team_name}")
             log_entries.append(f"- Request ID: {request_id}")
             log_entries.append(f"- Submitted: {info['submitted']}")
-            if not drop:
-                cursor.execute(
-                    "UPDATE roster_move_requests SET status = 'failed' WHERE id = %s",
-                    (request_id,),
-                )
-                log_entries.append("- Result: failed (no drop player in request)")
-                log_entries.append("")
-                processed += 1
-                continue
-
-            log_entries.append(f"- Drop: {drop['player_name']}")
-            if drop["player_id"] not in roster_ids:
-                cursor.execute(
-                    "UPDATE roster_move_requests SET status = 'failed' WHERE id = %s",
-                    (request_id,),
-                )
-                log_entries.append("- Result: failed (drop player not on team)")
-                log_entries.append("")
-                processed += 1
-                continue
+            if drop:
+                log_entries.append(f"- Drop: {drop['player_name']}")
+                if drop["player_id"] not in roster_ids:
+                    cursor.execute(
+                        "UPDATE roster_move_requests SET status = 'failed' WHERE id = %s",
+                        (request_id,),
+                    )
+                    log_entries.append("- Result: failed (drop player not on team)")
+                    log_entries.append("")
+                    processed += 1
+                    continue
+            else:
+                if not info["has_empty_roster_spot"]:
+                    cursor.execute(
+                        "UPDATE roster_move_requests SET status = 'failed' WHERE id = %s",
+                        (request_id,),
+                    )
+                    log_entries.append("- Drop: none")
+                    log_entries.append("- Result: failed (drop required)")
+                    log_entries.append("")
+                    processed += 1
+                    continue
+                log_entries.append("- Drop: none (empty roster spot)")
 
             selected_add = None
             for choice in add_choices:
@@ -225,16 +228,18 @@ def main():
                 processed += 1
                 continue
 
-            cursor.execute(
-                "DELETE FROM team_player WHERE team_id = %s AND player_id = %s",
-                (team_id, drop["player_id"]),
-            )
+            if drop:
+                cursor.execute(
+                    "DELETE FROM team_player WHERE team_id = %s AND player_id = %s",
+                    (team_id, drop["player_id"]),
+                )
             cursor.execute(
                 "INSERT INTO team_player (team_id, player_id) VALUES (%s, %s)",
                 (team_id, selected_add["player_id"]),
             )
             available_players.discard(selected_add["player_id"])
-            available_players.add(drop["player_id"])
+            if drop:
+                available_players.add(drop["player_id"])
 
             cursor.execute(
                 "UPDATE roster_move_requests SET status = 'processed' WHERE id = %s",
