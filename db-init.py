@@ -2,7 +2,6 @@ import os
 from importlib.util import module_from_spec, spec_from_file_location
 
 from db import get_connection, ensure_identities
-from scoring import score_weeks
 
 
 def load_module(module_name, filename):
@@ -358,11 +357,7 @@ def main():
         make_league.assign_players_to_teams(conn, team_ids, force=True)
         conn.commit()
 
-    stats_populate = load_module("stats_populate", "stats-populate.py")
-    stats_populate.populate_2025_stats(start_date=None, end_date=None)
-    score_weeks()
-
-    print("Seeded roster, teams, stats, and scoring.")
+    print("Seeded roster and teams.")
 
 
 if __name__ == "__main__":
