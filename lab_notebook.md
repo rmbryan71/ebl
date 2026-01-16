@@ -4,7 +4,7 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 # January 16, 2026
 2:40 AM - As I work, I have ideas for other projects that I want to do after the Experimental Baseball League is up and running. Currently, that's motivating me to work a lot. This morning, I'm going to focus on implementing the rest of the roster move process, then automated testing.
 4:00 AM - I have a start on code to handle when players leave the MLB Phillies. Also, I have test data setup that creates user accounts for 8 team owners, and opens a browser window for each owner, logged in as that owner, navigated to their team page so that I can start testing roster moves. Next, I need to step through the 2025 season one week at a time write test scripts to handle MLB roster changes, EBL roster changes, open roster spots and the roster move request process.
-
+5:15 AM - Progress on the handling of roster moves. Added a testing for roster move changes. Made a set of scripts to step through the 2025 season day by day and test roster moves and stats. Overhauled the league rules on roster moves.
 
 
 # January 15, 2026
