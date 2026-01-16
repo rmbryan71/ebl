@@ -957,43 +957,43 @@ def roster_move_view():
                 if error:
                     conn.rollback()
                 else:
-                cursor.execute(
-                    """
-                    UPDATE roster_move_requests
-                    SET status = 'superseded'
-                    WHERE team_id = %s AND status = 'pending'
-                    """,
-                    (team_id,),
-                )
+                    cursor.execute(
+                        """
+                        UPDATE roster_move_requests
+                        SET status = 'superseded'
+                        WHERE team_id = %s AND status = 'pending'
+                        """,
+                        (team_id,),
+                    )
                     submitted_at = datetime.now(EASTERN_TZ).replace(tzinfo=None).isoformat(sep=" ")
                     cursor.execute(
-                    """
-                    INSERT INTO roster_move_requests (team_id, submitted, status)
-                    VALUES (%s, %s, 'pending')
-                    RETURNING id
-                    """,
-                    (team_id, submitted_at),
+                        """
+                        INSERT INTO roster_move_requests (team_id, submitted, status)
+                        VALUES (%s, %s, 'pending')
+                        RETURNING id
+                        """,
+                        (team_id, submitted_at),
                     )
                     request_id = cursor.fetchone()["id"]
                     cursor.execute(
-                    """
-                    INSERT INTO roster_move_request_players (roster_move_request_id, player_id, action)
-                    VALUES (%s, %s, 'drop')
-                    """,
-                    (request_id, drop_player_id),
+                        """
+                        INSERT INTO roster_move_request_players (roster_move_request_id, player_id, action)
+                        VALUES (%s, %s, 'drop')
+                        """,
+                        (request_id, drop_player_id),
                     )
                     for priority in sorted(choice_map.keys()):
                         cursor.execute(
-                        """
-                        INSERT INTO roster_move_request_players (
-                            roster_move_request_id,
-                            player_id,
-                            action,
-                            priority
-                        )
-                        VALUES (%s, %s, 'add', %s)
-                        """,
-                        (request_id, choice_map[priority], priority),
+                            """
+                            INSERT INTO roster_move_request_players (
+                                roster_move_request_id,
+                                player_id,
+                                action,
+                                priority
+                            )
+                            VALUES (%s, %s, 'add', %s)
+                            """,
+                            (request_id, choice_map[priority], priority),
                         )
                     conn.commit()
                     success = "Roster move submitted."
