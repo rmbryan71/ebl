@@ -4,9 +4,9 @@
 - Finding Nimmo
 - Bat out of Snell
 - Baby Got Zack
-- Jazz Swingers
+- Two Dollar Ballers
+- Philly Phlip Phlops
 - Donald Knuth Packed My Bags
-- I Can Make the Bench Guys Good For A Week End
 - Secular Humanist All-Stars
 - κόσμε UTF-8 Test Team
 
