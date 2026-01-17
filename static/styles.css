@@ -382,6 +382,14 @@ a:hover {
   gap: 1.5rem;
 }
 
+.section-label {
+  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+}
+
 .player-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -421,6 +429,11 @@ a:hover {
   box-shadow: 0 18px 30px var(--shadow);
   border: 1px solid rgba(15, 26, 44, 0.08);
   overflow-x: auto;
+}
+
+.stats-table .empty-state {
+  margin: 0.6rem 0 0;
+  color: var(--ink-soft);
 }
 
 .rules-hero {

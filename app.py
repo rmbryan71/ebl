@@ -307,6 +307,134 @@ def load_team_stats(team_id=None):
     return teams, selected_team_id, selected_team_name, rows, totals, player_totals
 
 
+def load_team_roster_history(team_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    history = []
+
+    cursor.execute(
+        """
+        SELECT MIN(submitted) AS first_submitted
+        FROM roster_move_requests
+        WHERE team_id = %s
+        """,
+        (team_id,),
+    )
+    first_submitted = cursor.fetchone()["first_submitted"]
+
+    if first_submitted:
+        cursor.execute(
+            """
+            SELECT
+                a.datetime AS event_time,
+                p.name AS player_name
+            FROM audit a
+            JOIN players p
+              ON p.mlb_id = (a.new_value::json->>'player_mlb_id')::int
+            WHERE a.table_name = 'team_player'
+              AND a.operation = 'INSERT'
+              AND (a.new_value::json->>'team_id')::int = %s
+              AND a.datetime < %s
+            """,
+            (team_id, first_submitted),
+        )
+    else:
+        cursor.execute(
+            """
+            SELECT
+                a.datetime AS event_time,
+                p.name AS player_name
+            FROM audit a
+            JOIN players p
+              ON p.mlb_id = (a.new_value::json->>'player_mlb_id')::int
+            WHERE a.table_name = 'team_player'
+              AND a.operation = 'INSERT'
+              AND (a.new_value::json->>'team_id')::int = %s
+            """,
+            (team_id,),
+        )
+    for row in cursor.fetchall():
+        history.append(
+            {
+                "event_time": row["event_time"],
+                "player_name": row["player_name"],
+                "action": "Added",
+                "reason": "Purchased at auction",
+            }
+        )
+
+    cursor.execute(
+        """
+        SELECT r.submitted AS event_time,
+               rmp.action,
+               p.name AS player_name
+        FROM roster_move_requests r
+        JOIN roster_move_request_players rmp ON rmp.roster_move_request_id = r.id
+        JOIN players p ON p.mlb_id = rmp.player_mlb_id
+        WHERE r.team_id = %s AND r.status = 'processed'
+        """,
+        (team_id,),
+    )
+    for row in cursor.fetchall():
+        history.append(
+            {
+                "event_time": row["event_time"],
+                "player_name": row["player_name"],
+                "action": "Added" if row["action"] == "add" else "Dropped",
+                "reason": "Roster move processed",
+            }
+        )
+
+    cursor.execute(
+        """
+        SELECT a.deactivated_at AS event_time,
+               p.name AS player_name
+        FROM alumni a
+        JOIN players p ON p.mlb_id = a.player_mlb_id
+        WHERE a.team_id = %s
+        """,
+        (team_id,),
+    )
+    for row in cursor.fetchall():
+        history.append(
+            {
+                "event_time": row["event_time"],
+                "player_name": row["player_name"],
+                "action": "Dropped",
+                "reason": "Removed from MLB 40-man",
+            }
+        )
+
+    conn.close()
+
+    def to_sort_key(value):
+        if isinstance(value, datetime):
+            return value
+        if isinstance(value, date):
+            return datetime.combine(value, datetime.min.time())
+        try:
+            return datetime.strptime(value, "%Y-%m-%d")
+        except (TypeError, ValueError):
+            return datetime.min
+
+    history.sort(key=lambda item: to_sort_key(item["event_time"]), reverse=True)
+
+    for entry in history:
+        value = entry["event_time"]
+        if isinstance(value, datetime):
+            entry["event_time"] = value.date().strftime("%b %-d, %Y")
+        elif isinstance(value, date):
+            entry["event_time"] = value.strftime("%b %-d, %Y")
+        else:
+            try:
+                entry["event_time"] = datetime.strptime(value, "%Y-%m-%d").strftime(
+                    "%b %-d, %Y"
+                )
+            except (TypeError, ValueError):
+                entry["event_time"] = value
+    return history
+
+
 @app.route("/")
 def roster_view():
     teams, total_players = load_roster()
@@ -326,6 +454,9 @@ def team_stats():
     teams, selected_team_id, selected_team_name, rows, totals, player_totals = load_team_stats(
         team_id=team_id
     )
+    roster_history = []
+    if selected_team_id:
+        roster_history = load_team_roster_history(selected_team_id)
     show_roster_move = False
     if current_user.is_authenticated:
         if current_user.role == "admin":
@@ -340,6 +471,7 @@ def team_stats():
         rows=rows,
         totals=totals,
         player_totals=player_totals,
+        roster_history=roster_history,
         show_roster_move=show_roster_move,
     )
 

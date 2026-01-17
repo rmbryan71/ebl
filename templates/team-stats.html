@@ -45,6 +45,7 @@
 
     <main class="stats">
       {% if teams %}
+      <h3 class="section-label">Current Roster</h3>
       <section class="player-cards">
         {% for player in player_totals %}
         <div class="player-card">
@@ -64,6 +65,7 @@
         {% endfor %}
       </section>
 
+      <h3 class="section-label">Stats History</h3>
       <section class="stats-table team-stats-table">
         <div class="stats-row header">
           <span>Date</span>
@@ -81,6 +83,27 @@
           <span data-label="{{ 'Pitching' if row.pitching else '' }}">{{ row.pitching if row.pitching else "" }}</span>
         </div>
         {% endfor %}
+      </section>
+
+      <h3 class="section-label">Team Roster History</h3>
+      <section class="stats-table team-history-table">
+        <div class="stats-row header">
+          <span>Date</span>
+          <span>Player</span>
+          <span>Action</span>
+          <span>Reason</span>
+        </div>
+        {% for entry in roster_history %}
+        <div class="stats-row" style="--i: {{ loop.index0 }}">
+          <span data-label="Date">{{ entry.event_time }}</span>
+          <span data-label="Player">{{ entry.player_name }}</span>
+          <span data-label="Action">{{ entry.action }}</span>
+          <span data-label="Reason">{{ entry.reason }}</span>
+        </div>
+        {% endfor %}
+        {% if not roster_history %}
+        <p class="empty-state">No roster history yet.</p>
+        {% endif %}
       </section>
       {% else %}
       <p class="empty-state">No teams found. Create teams first.</p>
