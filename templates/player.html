@@ -70,14 +70,22 @@
       <section class="stats-table">
         <div class="stats-row header">
           <span>Date</span>
+          {% if show_offense %}
           <span>Offense</span>
+          {% endif %}
+          {% if show_pitching %}
           <span>Pitching</span>
+          {% endif %}
         </div>
         {% for row in stats_rows %}
         <div class="stats-row" style="--i: {{ loop.index0 }}">
           <span data-label="Date">{{ row.date }}</span>
+          {% if show_offense %}
           <span data-label="Offense">{{ row.offense }}</span>
+          {% endif %}
+          {% if show_pitching %}
           <span data-label="Pitching">{{ row.pitching }}</span>
+          {% endif %}
         </div>
         {% endfor %}
       </section>

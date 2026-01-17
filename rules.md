@@ -1,51 +1,5 @@
 # Experimental Baseball League Rules
 
-## Change log
-January 16, 2026: v 1.01 - roster moves
-- Overhauls the roster moves section.
-
-January 13, 2026: v 1.00 - first prototype release
-- Removes the comms plan, tech plan, roadmap, and lists.
-- Removes the privacy and audit trail requirements.
-- Fixes pitching scoring to outs, not innings pitched.
-- Clarifies scoring for ties of zero stats.
-- Simplifies the wording for scoring.
-- Adds link to the live prototype.
-
-January 10, 2026: v 0.04 - documentation changes
-- Overhauls wording throughout.
-- Updates formatting for readability.
-- Adds 40-man roster requirement.
-
-January 9, 2026: v 0.04 - overhaul, move to web
-- Overhaul, move to web.
-- Removes implementation section to tech plan.
-- Removes irrelevant conversational tangents.
-- Removes communications plan to comms plan.
-
-January 8, 2026: v 0.03 - documentation changes
-- Overhauls the auction.
-- Removes unhelpful strategy note from roster section.
-- Adds special case to roster move processing order.
-- Clarifies how empty roster spots can happen.
-- Specifies lack of remedy for injuries or suspensions.
-
-January 7, 2026: v 0.02 - documentation changes
-- Adds stolen bases to offense.
-- Changes auction order to nominations.
-- Specifies whole dollar amounts for bids.
-- Overhauls ties.
-- Adds missing headings.
-- Adds future features section.
-- Changes roster moves from daily to weekly.
-- Specifies that ties during roster moves are handled randomly.
-- Adds note about documentation to implementation section.
-- Adds privacy requirement to implementation section.
-- Adds audit trail requirement to implementation section.
-- Adds communication plan to implementation section.
-
-January 6, 2026: v 0.01 - initial release
-
 ## Introduction
 1. Phillies players only.
 2. A live auction for players.
@@ -117,3 +71,49 @@ January 6, 2026: v 0.01 - initial release
 13. If an auction starts with two owners simultaneously bidding $97 for a player, the older owner gets the player.
 14. Otherwise, it is an open auction, so owners just shout out how much they are willing to pay and that is the going price.
 15. Ownership of players is for the 2026 season only.
+
+## Change log
+January 16, 2026: v 1.01 - roster moves
+- Overhauls the roster moves section.
+
+January 13, 2026: v 1.00 - first prototype release
+- Removes the comms plan, tech plan, roadmap, and lists.
+- Removes the privacy and audit trail requirements.
+- Fixes pitching scoring to outs, not innings pitched.
+- Clarifies scoring for ties of zero stats.
+- Simplifies the wording for scoring.
+- Adds link to the live prototype.
+
+January 10, 2026: v 0.04 - documentation changes
+- Overhauls wording throughout.
+- Updates formatting for readability.
+- Adds 40-man roster requirement.
+
+January 9, 2026: v 0.04 - overhaul, move to web
+- Overhaul, move to web.
+- Removes implementation section to tech plan.
+- Removes irrelevant conversational tangents.
+- Removes communications plan to comms plan.
+
+January 8, 2026: v 0.03 - documentation changes
+- Overhauls the auction.
+- Removes unhelpful strategy note from roster section.
+- Adds special case to roster move processing order.
+- Clarifies how empty roster spots can happen.
+- Specifies lack of remedy for injuries or suspensions.
+
+January 7, 2026: v 0.02 - documentation changes
+- Adds stolen bases to offense.
+- Changes auction order to nominations.
+- Specifies whole dollar amounts for bids.
+- Overhauls ties.
+- Adds missing headings.
+- Adds future features section.
+- Changes roster moves from daily to weekly.
+- Specifies that ties during roster moves are handled randomly.
+- Adds note about documentation to implementation section.
+- Adds privacy requirement to implementation section.
+- Adds audit trail requirement to implementation section.
+- Adds communication plan to implementation section.
+
+January 6, 2026: v 0.01 - initial release

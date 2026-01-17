@@ -664,6 +664,8 @@ def load_player_details(player_id):
                 year = None
 
     stats_rows = []
+    show_offense = False
+    show_pitching = False
     if year:
         cursor.execute(
             """
@@ -676,6 +678,8 @@ def load_player_details(player_id):
             (player_id, f"{year}-%"),
         )
         stats_rows = cursor.fetchall()
+        show_offense = any((row.get("offense") or 0) != 0 for row in stats_rows)
+        show_pitching = any((row.get("pitching") or 0) != 0 for row in stats_rows)
         for row in stats_rows:
             value = row["date"]
             if isinstance(value, datetime):
@@ -689,7 +693,7 @@ def load_player_details(player_id):
                     row["date"] = value
 
     conn.close()
-    return player, stats_rows, year
+    return player, stats_rows, year, show_offense, show_pitching
 
 
 @app.route("/player")
@@ -698,14 +702,23 @@ def player_view():
     if player_id is not None and player_id <= 0:
         abort(400)
     if not player_id:
-        return render_template("player.html", player=None, stats_rows=[], year=None)
+        return render_template(
+            "player.html",
+            player=None,
+            stats_rows=[],
+            year=None,
+            show_offense=False,
+            show_pitching=False,
+        )
 
-    player, stats_rows, year = load_player_details(player_id)
+    player, stats_rows, year, show_offense, show_pitching = load_player_details(player_id)
     return render_template(
         "player.html",
         player=player,
         stats_rows=stats_rows,
         year=year,
+        show_offense=show_offense,
+        show_pitching=show_pitching,
     )
 
 
