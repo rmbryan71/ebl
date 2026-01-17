@@ -14,6 +14,15 @@ def make_test_league_and_teams(conn, team_count=8, seed=None):
     cursor = conn.cursor()
     ensure_identities(conn, ["leagues", "users", "teams"])
 
+    cursor.execute("DELETE FROM team_player")
+    cursor.execute("DELETE FROM stats")
+    cursor.execute("DELETE FROM points")
+    cursor.execute("DELETE FROM roster_move_request_players")
+    cursor.execute("DELETE FROM roster_move_requests")
+    cursor.execute("DELETE FROM alumni")
+    cursor.execute("UPDATE user_accounts SET team_id = NULL")
+    cursor.execute("DELETE FROM teams")
+
     cursor.execute("SELECT id FROM leagues ORDER BY id LIMIT 1")
     row = cursor.fetchone()
     if row:
