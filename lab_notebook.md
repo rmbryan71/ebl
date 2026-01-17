@@ -10,6 +10,10 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 4:40 PM - Reverted all automated testing. Starting over.
 5:35 PM - Break for dinner.
 6:00 PM - Back, time-boxing. Next 30 minutes focus on automated testing.
+6:30 PM - next 30-minutes focus on simulating 2025.
+7:00 PM - next 30-minutes overhaul how mlb transactions and roster moves are handled.
+
+
 
 
 # January 15, 2026
