@@ -45,7 +45,6 @@
         <div class="stats-row header available-row">
           <span>Player</span>
           <span>Position</span>
-          <span>Birth date</span>
         </div>
         {% for row in rows %}
         <div class="stats-row available-row" style="--i: {{ loop.index0 }}">
@@ -55,7 +54,6 @@
             </a>
           </span>
           <span data-label="Position">{{ row.display_position or "-" }}</span>
-          <span data-label="Birth date">{{ row.birth_date or "-" }}</span>
         </div>
         {% endfor %}
       </section>

@@ -57,7 +57,9 @@
         <div class="stats-row header weekly-row">
           <span>Team</span>
           <span>Outs</span>
+          {% if show_pitching_points %}
           <span>Points</span>
+          {% endif %}
         </div>
         {% for row in pitching_rows %}
         <div class="stats-row weekly-row" style="--i: {{ loop.index0 }}">
@@ -65,7 +67,9 @@
             <a href="/team?team_id={{ row.team_id }}">{{ row.team_name }}</a>
           </span>
           <span>{{ row.total_pitching or 0 }}</span>
+          {% if show_pitching_points %}
           <span>{{ pitching_points.get(row.team_id) if pitching_points.get(row.team_id) is not none else "-" }}</span>
+          {% endif %}
         </div>
         {% endfor %}
       </section>
@@ -75,7 +79,9 @@
         <div class="stats-row header weekly-row">
           <span>Team</span>
           <span>Offense</span>
+          {% if show_offense_points %}
           <span>Points</span>
+          {% endif %}
         </div>
         {% for row in offense_rows %}
         <div class="stats-row weekly-row" style="--i: {{ loop.index0 }}">
@@ -83,7 +89,9 @@
             <a href="/team?team_id={{ row.team_id }}">{{ row.team_name }}</a>
           </span>
           <span>{{ row.total_offense or 0 }}</span>
+          {% if show_offense_points %}
           <span>{{ offense_points.get(row.team_id) if offense_points.get(row.team_id) is not none else "-" }}</span>
+          {% endif %}
         </div>
         {% endfor %}
       </section>

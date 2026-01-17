@@ -507,6 +507,7 @@ def load_leaderboard(week_start=None):
     if selected_week_start is None and week_starts:
         selected_week_start = week_starts[0]
 
+
     params = []
     join_filter = ""
     selected_week_end = None
@@ -572,6 +573,9 @@ def load_leaderboard(week_start=None):
         )
         pitching_points = {row["team_id"]: row["value"] for row in cursor.fetchall()}
 
+    show_offense_points = any(value for value in offense_points.values())
+    show_pitching_points = any(value for value in pitching_points.values())
+
     conn.close()
     return (
         offense_rows,
@@ -580,6 +584,8 @@ def load_leaderboard(week_start=None):
         selected_week_start,
         offense_points,
         pitching_points,
+        show_offense_points,
+        show_pitching_points,
     )
 
 
@@ -593,6 +599,8 @@ def week_view():
         selected_week_start,
         offense_points,
         pitching_points,
+        show_offense_points,
+        show_pitching_points,
     ) = load_leaderboard(week_start=week_start)
     if week_start and selected_week_start is None and week_starts:
         abort(400)
@@ -604,6 +612,8 @@ def week_view():
         selected_week_start=selected_week_start,
         offense_points=offense_points,
         pitching_points=pitching_points,
+        show_offense_points=show_offense_points,
+        show_pitching_points=show_pitching_points,
         timedelta=timedelta,
     )
 
