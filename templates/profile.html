@@ -21,7 +21,7 @@
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
       <a href="/logout" class="nav-logout">Logout</a>
-      <a href="/profile" class="nav-user">{{ current_user.email }}</a>
+      <a href="/profile" class="nav-user">{{ nav_user_label }}</a>
       {% else %}
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
@@ -43,7 +43,7 @@
     <main class="rules-page">
       <section class="rules-card">
         <h2>Account</h2>
-        <p class="news-paragraph"><strong>Email:</strong> {{ current_user.email }}</p>
+        <p class="news-paragraph"><strong>Email:</strong> {{ nav_user_label }}</p>
         <p class="news-paragraph"><strong>Role:</strong> {{ current_user.role|capitalize }}</p>
       </section>
 

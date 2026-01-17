@@ -43,6 +43,25 @@ class AuthUser(UserMixin):
         return self.active
 
 
+@app.context_processor
+def inject_nav_user_label():
+    label = ""
+    if current_user.is_authenticated:
+        if current_user.team_id:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT name FROM teams WHERE id = %s", (current_user.team_id,))
+            row = cursor.fetchone()
+            conn.close()
+            if row:
+                label = row["name"]
+        elif current_user.role == "admin":
+            label = "League Admin"
+        else:
+            label = current_user.email
+    return {"nav_user_label": label}
+
+
 @login_manager.user_loader
 def load_user(user_id):
     conn = get_connection()
