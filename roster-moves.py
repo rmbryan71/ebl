@@ -43,9 +43,9 @@ def load_pending_requests(cursor):
 def load_request_players(cursor, request_id):
     cursor.execute(
         """
-        SELECT rmp.player_id, rmp.action, rmp.priority, p.name AS player_name
+        SELECT rmp.player_mlb_id, rmp.action, rmp.priority, p.name AS player_name
         FROM roster_move_request_players rmp
-        JOIN players p ON p.id = rmp.player_id
+        JOIN players p ON p.mlb_id = rmp.player_mlb_id
         WHERE rmp.roster_move_request_id = %s
         ORDER BY rmp.action, rmp.priority NULLS LAST
         """,
@@ -57,10 +57,10 @@ def load_request_players(cursor, request_id):
 def load_available_players(cursor):
     cursor.execute(
         """
-        SELECT p.id
+        SELECT p.mlb_id
         FROM players p
-        LEFT JOIN team_player tp ON tp.player_id = p.id
-        WHERE p.is_active = 1 AND tp.player_id IS NULL
+        LEFT JOIN team_player tp ON tp.player_mlb_id = p.mlb_id
+        WHERE p.is_active = 1 AND tp.player_mlb_id IS NULL
         """
     )
     return {row["id"] for row in cursor.fetchall()}
@@ -69,9 +69,9 @@ def load_available_players(cursor):
 def load_team_roster(cursor, team_id):
     cursor.execute(
         """
-        SELECT p.id, p.name
+        SELECT p.mlb_id, p.name
         FROM team_player tp
-        JOIN players p ON p.id = tp.player_id
+        JOIN players p ON p.mlb_id = tp.player_mlb_id
         WHERE tp.team_id = %s
         ORDER BY p.name
         """,
@@ -163,7 +163,7 @@ def main():
             team_id = info["team_id"]
             team_name = info["team_name"]
             roster = load_team_roster(cursor, team_id)
-            roster_ids = {row["id"] for row in roster}
+            roster_ids = {row["mlb_id"] for row in roster}
             players = load_request_players(cursor, request_id)
             drop = next((p for p in players if p["action"] == "drop"), None)
             add_choices = [p for p in players if p["action"] == "add"]
@@ -173,7 +173,7 @@ def main():
             log_entries.append(f"- Submitted: {info['submitted']}")
             if drop:
                 log_entries.append(f"- Drop: {drop['player_name']}")
-                if drop["player_id"] not in roster_ids:
+                if drop["player_mlb_id"] not in roster_ids:
                     cursor.execute(
                         "UPDATE roster_move_requests SET status = 'failed' WHERE id = %s",
                         (request_id,),
@@ -197,7 +197,7 @@ def main():
 
             selected_add = None
             for choice in add_choices:
-                if choice["player_id"] in available_players:
+                if choice["player_mlb_id"] in available_players:
                     selected_add = choice
                     break
 
@@ -218,16 +218,16 @@ def main():
 
             if drop:
                 cursor.execute(
-                    "DELETE FROM team_player WHERE team_id = %s AND player_id = %s",
-                    (team_id, drop["player_id"]),
+                    "DELETE FROM team_player WHERE team_id = %s AND player_mlb_id = %s",
+                    (team_id, drop["player_mlb_id"]),
                 )
             cursor.execute(
-                "INSERT INTO team_player (team_id, player_id) VALUES (%s, %s)",
-                (team_id, selected_add["player_id"]),
+                "INSERT INTO team_player (team_id, player_mlb_id) VALUES (%s, %s)",
+                (team_id, selected_add["player_mlb_id"]),
             )
-            available_players.discard(selected_add["player_id"])
+            available_players.discard(selected_add["player_mlb_id"])
             if drop:
-                available_players.add(drop["player_id"])
+                available_players.add(drop["player_mlb_id"])
 
             cursor.execute(
                 "UPDATE roster_move_requests SET status = 'processed' WHERE id = %s",

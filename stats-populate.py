@@ -61,14 +61,14 @@ def populate_2025_stats(replace=True, game_type="R", start_date=None, end_date=N
         if not team_ids:
             raise SystemExit("No teams found in ebl.db. Create teams before populating stats.")
 
-        cursor.execute("SELECT player_id, team_id FROM team_player")
-        team_map = {row["player_id"]: row["team_id"] for row in cursor.fetchall()}
+        cursor.execute("SELECT player_mlb_id, team_id FROM team_player")
+        team_map = {row["player_mlb_id"]: row["team_id"] for row in cursor.fetchall()}
 
-        cursor.execute("SELECT id, mlb_id FROM players WHERE is_active = 1 ORDER BY id")
+        cursor.execute("SELECT mlb_id FROM players WHERE is_active = 1 ORDER BY mlb_id")
         players = cursor.fetchall()
 
         if replace and players:
-            player_ids = [str(row["id"]) for row in players]
+            player_ids = [str(row["mlb_id"]) for row in players]
             placeholders = ",".join(["%s"] * len(player_ids))
             params = []
             if start_date or end_date:
@@ -85,14 +85,13 @@ def populate_2025_stats(replace=True, game_type="R", start_date=None, end_date=N
                 date_clause = "date >= %s AND date < %s"
                 params.extend(["2025-01-01", "2026-01-01"])
             params.extend(player_ids)
-            delete_sql = f"DELETE FROM stats WHERE {date_clause} AND player_id IN ({placeholders})"
+            delete_sql = f"DELETE FROM stats WHERE {date_clause} AND player_mlb_id IN ({placeholders})"
             cursor.execute(delete_sql, params)
 
         rows = []
         for player in players:
-            player_id = player["id"]
             mlb_id = player["mlb_id"]
-            team_id = team_map.get(player_id)
+            team_id = team_map.get(mlb_id)
             if team_id is None:
                 continue
 
@@ -128,7 +127,7 @@ def populate_2025_stats(replace=True, game_type="R", start_date=None, end_date=N
             for date_value, totals in daily.items():
                 rows.append(
                     (
-                        player_id,
+                        mlb_id,
                         team_id,
                         date_value,
                         totals["offense"],
@@ -139,7 +138,7 @@ def populate_2025_stats(replace=True, game_type="R", start_date=None, end_date=N
         if rows:
             cursor.executemany(
                 """
-                INSERT INTO stats (player_id, team_id, date, offense, pitching)
+                INSERT INTO stats (player_mlb_id, team_id, date, offense, pitching)
                 VALUES (%s, %s, %s, %s, %s)
                 """,
                 rows,

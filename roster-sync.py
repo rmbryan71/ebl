@@ -115,18 +115,18 @@ def sync_phillies_40_man(roster_date=None):
                 last_updated = %s
             WHERE is_active = 1
               AND mlb_id NOT IN ({placeholders})
-            RETURNING id
+            RETURNING mlb_id
             """,
             (deactivated_at, *active_mlb_ids),
         )
-        removed_player_ids = [row["id"] for row in cursor.fetchall()]
+        removed_player_ids = [row["mlb_id"] for row in cursor.fetchall()]
         if removed_player_ids:
             removed_placeholders = ",".join(["%s"] * len(removed_player_ids))
             cursor.execute(
                 f"""
-                SELECT player_id, team_id
+                SELECT player_mlb_id, team_id
                 FROM team_player
-                WHERE player_id IN ({removed_placeholders})
+                WHERE player_mlb_id IN ({removed_placeholders})
                 """,
                 removed_player_ids,
             )
@@ -134,11 +134,11 @@ def sync_phillies_40_man(roster_date=None):
             if assignments:
                 cursor.executemany(
                     """
-                    INSERT INTO alumni (player_id, team_id, deactivated_at)
+                    INSERT INTO alumni (player_mlb_id, team_id, deactivated_at)
                     VALUES (%s, %s, %s)
                     """,
                     [
-                        (row["player_id"], row["team_id"], deactivated_at)
+                        (row["player_mlb_id"], row["team_id"], deactivated_at)
                         for row in assignments
                     ],
                 )
@@ -149,7 +149,7 @@ def sync_phillies_40_man(roster_date=None):
                 WHERE id IN (
                     SELECT team_id
                     FROM team_player
-                    WHERE player_id IN ({removed_placeholders})
+                    WHERE player_mlb_id IN ({removed_placeholders})
                 )
                 """,
                 removed_player_ids,
@@ -157,7 +157,7 @@ def sync_phillies_40_man(roster_date=None):
             cursor.execute(
                 f"""
                 DELETE FROM team_player
-                WHERE player_id IN ({removed_placeholders})
+                WHERE player_mlb_id IN ({removed_placeholders})
                 """,
                 removed_player_ids,
             )
@@ -169,7 +169,7 @@ def sync_phillies_40_man(roster_date=None):
         WHERE id IN (
             SELECT tp.team_id
             FROM team_player tp
-            JOIN players p ON p.id = tp.player_id
+            JOIN players p ON p.mlb_id = tp.player_mlb_id
             WHERE p.is_active = 0
         )
         """
@@ -177,8 +177,8 @@ def sync_phillies_40_man(roster_date=None):
     cursor.execute(
         """
         DELETE FROM team_player
-        WHERE player_id IN (
-            SELECT id
+        WHERE player_mlb_id IN (
+            SELECT mlb_id
             FROM players
             WHERE is_active = 0
         )

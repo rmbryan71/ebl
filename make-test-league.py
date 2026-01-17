@@ -132,8 +132,8 @@ def assign_players_to_teams(conn, team_ids, force=False, seed=None, max_per_team
         if cursor.fetchone()["count"] > 0:
             return 0
 
-    cursor.execute("SELECT id FROM players WHERE is_active = 1 ORDER BY id")
-    player_ids = [row["id"] for row in cursor.fetchall()]
+    cursor.execute("SELECT mlb_id FROM players WHERE is_active = 1 ORDER BY mlb_id")
+    player_ids = [row["mlb_id"] for row in cursor.fetchall()]
     if not player_ids:
         return 0
 
@@ -150,7 +150,7 @@ def assign_players_to_teams(conn, team_ids, force=False, seed=None, max_per_team
 
     cursor.executemany(
         """
-        INSERT INTO team_player (team_id, player_id)
+        INSERT INTO team_player (team_id, player_mlb_id)
         VALUES (%s, %s)
         ON CONFLICT DO NOTHING
         """,

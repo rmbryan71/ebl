@@ -189,12 +189,12 @@ def load_roster():
         SELECT
             t.name AS team_name,
             t.id AS team_id,
-            p.id AS player_id,
+            p.mlb_id AS player_id,
             p.name,
             p.position_name,
             p.is_active
         FROM players p
-        LEFT JOIN team_player tp ON tp.player_id = p.id
+        LEFT JOIN team_player tp ON tp.player_mlb_id = p.mlb_id
         LEFT JOIN teams t ON t.id = tp.team_id
         WHERE p.is_active = 1
         ORDER BY t.name IS NULL, t.name, p.name
@@ -240,10 +240,10 @@ def load_team_stats(team_id=None):
             s.date,
             s.offense,
             s.pitching,
-            p.id AS player_id,
+            p.mlb_id AS player_id,
             p.name AS player_name
         FROM stats s
-        JOIN players p ON p.id = s.player_id
+        JOIN players p ON p.mlb_id = s.player_mlb_id
         WHERE s.team_id = %s
           AND (COALESCE(s.offense, 0) != 0 OR COALESCE(s.pitching, 0) != 0)
         """ + date_filter + """
@@ -267,16 +267,16 @@ def load_team_stats(team_id=None):
     cursor.execute(
         """
         SELECT
-            p.id AS player_id,
+            p.mlb_id AS player_id,
             p.name AS player_name,
             COALESCE(SUM(s.offense), 0) AS total_offense,
             COALESCE(SUM(s.pitching), 0) AS total_pitching
         FROM team_player tp
-        JOIN players p ON p.id = tp.player_id
+        JOIN players p ON p.mlb_id = tp.player_mlb_id
         LEFT JOIN stats s
-            ON s.player_id = p.id AND s.team_id = tp.team_id
+            ON s.player_mlb_id = p.mlb_id AND s.team_id = tp.team_id
         WHERE tp.team_id = %s
-        GROUP BY p.id
+        GROUP BY p.mlb_id
         ORDER BY p.name
         """,
         (selected_team_id,),
@@ -481,16 +481,16 @@ def load_player_details(player_id):
     cursor.execute(
         """
         SELECT
-            p.id,
+            p.mlb_id,
             p.name,
             p.birth_date,
             p.position_name,
             t.id AS team_id,
             t.name AS team_name
         FROM players p
-        LEFT JOIN team_player tp ON tp.player_id = p.id
+        LEFT JOIN team_player tp ON tp.player_mlb_id = p.mlb_id
         LEFT JOIN teams t ON t.id = tp.team_id
-        WHERE p.id = %s
+        WHERE p.mlb_id = %s
         """,
         (player_id,),
     )
@@ -502,7 +502,7 @@ def load_player_details(player_id):
     player["display_position"] = "Pitcher" if position_name == "Pitcher" else "Hitter"
 
     cursor.execute(
-        "SELECT MIN(date) AS first_date FROM stats WHERE player_id = %s",
+        "SELECT MIN(date) AS first_date FROM stats WHERE player_mlb_id = %s",
         (player_id,),
     )
     first_row = cursor.fetchone()
@@ -525,7 +525,7 @@ def load_player_details(player_id):
             """
             SELECT date, offense, pitching
             FROM stats
-            WHERE player_id = %s AND date::text LIKE %s
+            WHERE player_mlb_id = %s AND date::text LIKE %s
               AND (COALESCE(offense, 0) != 0 OR COALESCE(pitching, 0) != 0)
             ORDER BY date DESC
             """,
@@ -600,13 +600,13 @@ def load_available_players():
     cursor.execute(
         """
         SELECT
-            p.id,
+            p.mlb_id,
             p.name,
             p.position_name,
             p.birth_date
         FROM players p
-        LEFT JOIN team_player tp ON tp.player_id = p.id
-        WHERE p.is_active = 1 AND tp.player_id IS NULL
+        LEFT JOIN team_player tp ON tp.player_mlb_id = p.mlb_id
+        WHERE p.is_active = 1 AND tp.player_mlb_id IS NULL
         ORDER BY p.name
         """
     )
@@ -784,9 +784,9 @@ def roster_move_view():
 
     cursor.execute(
         """
-        SELECT p.id, p.name, p.position_name
+        SELECT p.mlb_id, p.name, p.position_name
         FROM team_player tp
-        JOIN players p ON p.id = tp.player_id
+        JOIN players p ON p.mlb_id = tp.player_mlb_id
         WHERE tp.team_id = %s
         ORDER BY p.name
         """,
@@ -799,10 +799,10 @@ def roster_move_view():
 
     cursor.execute(
         """
-        SELECT p.id, p.name, p.position_name
+        SELECT p.mlb_id, p.name, p.position_name
         FROM players p
-        LEFT JOIN team_player tp ON tp.player_id = p.id
-        WHERE p.is_active = 1 AND tp.player_id IS NULL
+        LEFT JOIN team_player tp ON tp.player_mlb_id = p.mlb_id
+        WHERE p.is_active = 1 AND tp.player_mlb_id IS NULL
         ORDER BY p.name
         """
     )
@@ -827,11 +827,11 @@ def roster_move_view():
 
         if not drop_player_id and not has_empty_roster_spot:
             error = "Select a player to drop."
-        elif drop_player_id and drop_player_id not in {row["id"] for row in team_players}:
+        elif drop_player_id and drop_player_id not in {row["mlb_id"] for row in team_players}:
             error = "Selected drop player is not on your team."
         elif not choice_map:
             error = "Select at least one add player."
-        elif not set(choice_map.values()).issubset({row["id"] for row in available_players}):
+        elif not set(choice_map.values()).issubset({row["mlb_id"] for row in available_players}):
             error = "Selected add player is not available."
         else:
             try:
@@ -877,7 +877,7 @@ def roster_move_view():
                     if drop_player_id:
                         cursor.execute(
                             """
-                            INSERT INTO roster_move_request_players (roster_move_request_id, player_id, action)
+                            INSERT INTO roster_move_request_players (roster_move_request_id, player_mlb_id, action)
                             VALUES (%s, %s, 'drop')
                             """,
                             (request_id, drop_player_id),
@@ -887,7 +887,7 @@ def roster_move_view():
                             """
                             INSERT INTO roster_move_request_players (
                                 roster_move_request_id,
-                                player_id,
+                                player_mlb_id,
                                 action,
                                 priority
                             )
@@ -976,7 +976,7 @@ def pending_roster_moves_view():
                 rmp.priority,
                 p.name AS player_name
             FROM roster_move_request_players rmp
-            JOIN players p ON p.id = rmp.player_id
+            JOIN players p ON p.mlb_id = rmp.player_mlb_id
             WHERE rmp.roster_move_request_id = ANY(%s)
             ORDER BY rmp.roster_move_request_id, rmp.action, rmp.priority NULLS LAST
             """,

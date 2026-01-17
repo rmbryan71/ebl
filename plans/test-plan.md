@@ -156,3 +156,4 @@ Start with unit tests + DB integration tests. They give the best coverage-per-ef
 - 2026-01-16 21:30 ET: Ran unit tests via `.venv/bin/python -m pytest`; all 12 tests passed.
 - 2026-01-16 21:45 ET: Added route and DB integration coverage to the test suite.
 - 2026-01-16 21:48 ET: Ran full suite via `.venv/bin/python -m pytest`; 16 passed, 3 skipped.
+- 2026-01-16 23:56 ET: Ran full suite via `.venv/bin/python -m pytest`; 15 passed, 3 skipped.

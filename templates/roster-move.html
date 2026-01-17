@@ -65,7 +65,7 @@
               <div class="roster-move-list">
                 {% for player in team_players %}
                 <label class="roster-move-row">
-                  <input type="radio" name="drop_player_id" value="{{ player.id }}" {% if not has_empty_roster_spot %}required{% endif %} />
+                  <input type="radio" name="drop_player_id" value="{{ player.mlb_id }}" {% if not has_empty_roster_spot %}required{% endif %} />
                   <span class="roster-move-name">{{ player.name }}</span>
                 </label>
                 {% endfor %}
@@ -78,7 +78,7 @@
                 {% for player in available_players %}
                 <label class="roster-move-row roster-move-row--select">
                   <span class="roster-move-name">{{ player.name }}</span>
-                  <select class="roster-move-select" name="choice_{{ player.id }}">
+                  <select class="roster-move-select" name="choice_{{ player.mlb_id }}">
                     <option value="">Select</option>
                     <option value="1">First choice</option>
                     <option value="2">Second choice</option>
