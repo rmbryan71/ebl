@@ -6,6 +6,7 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 2:45 AM - Good progress. New workflow is to collaborate with AI on documenting a plan first, refining the plan until I understand what it's going to do and how it's going to work. Asking for a list of decisions with pros, cons, and recommendations helps. Next 45 minutes continue to focus on mlb roster change handling.
 3:35 AM - Ran the mlb roster change handling plan. Taking a 10-minute break.
 3:49 AM - Next 45-minutes to focus on simulating the 2025 season for testing.
+4:35 AM - I didn't realize that simulating a season would be almost as complicated as implementing mlb roster change handling, but it is. I'm working on a plan, still. Going to end this session. Next time, continue working on 2025 simulation plan.
 
 
 # January 16, 2026
