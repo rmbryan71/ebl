@@ -31,7 +31,6 @@ def test_core_tables_exist():
         "audit",
         "roster_move_requests",
         "roster_move_request_players",
-        "mlb_transactions",
     }
     assert expected.issubset(tables)
 

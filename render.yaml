@@ -9,13 +9,6 @@ services:
         value: America/New_York
 
 cronjobs:
-  - name: nightly-transactions-sync
-    schedule: "0 3 * * *"
-    env: python
-    command: python transactions-sync.py
-    envVars:
-      - key: TZ
-        value: America/New_York
   - name: nightly-roster-sync
     schedule: "30 3 * * *"
     env: python
