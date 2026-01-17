@@ -909,6 +909,20 @@ def profile_view():
 def roster_move_view():
     if current_user.role == "admin":
         team_id = request.args.get("team_id", type=int) or request.form.get("team_id", type=int)
+        if not team_id:
+            referrer = request.headers.get("Referer", "")
+            if referrer and "team_id=" in referrer:
+                try:
+                    team_id = int(referrer.split("team_id=", 1)[1].split("&", 1)[0])
+                except ValueError:
+                    team_id = None
+        if not team_id:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT id FROM teams ORDER BY name LIMIT 1")
+            row = cursor.fetchone()
+            conn.close()
+            team_id = row["id"] if row else None
     else:
         team_id = current_user.team_id
     if not team_id:

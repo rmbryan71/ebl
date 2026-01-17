@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 from pathlib import Path
@@ -6,6 +7,25 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
 
 from db import get_connection
+
+
+def write_audit_entry(cursor, operation, old_value, new_value):
+    cursor.execute(
+        """
+        INSERT INTO audit (datetime, user_id, table_name, operation, old_value, new_value, prev_hash, row_hash)
+        VALUES (
+            CURRENT_TIMESTAMP,
+            %s,
+            'user_accounts',
+            %s,
+            %s,
+            %s,
+            (SELECT row_hash FROM audit ORDER BY id DESC LIMIT 1),
+            encode(gen_random_bytes(16), 'hex')
+        )
+        """,
+        (0, operation, old_value, new_value),
+    )
 
 
 def main():
@@ -39,8 +59,25 @@ def main():
                 raise SystemExit("Account is not an owner role.")
 
             cursor.execute(
+                "SELECT id, email, role, team_id FROM user_accounts WHERE email = %s",
+                (email,),
+            )
+            old_row = cursor.fetchone()
+
+            cursor.execute(
                 "UPDATE user_accounts SET team_id = %s WHERE email = %s",
                 (team_id, email),
+            )
+            cursor.execute(
+                "SELECT id, email, role, team_id FROM user_accounts WHERE email = %s",
+                (email,),
+            )
+            new_row = cursor.fetchone()
+            write_audit_entry(
+                cursor,
+                "UPDATE",
+                json.dumps(old_row) if old_row else None,
+                json.dumps(new_row) if new_row else None,
             )
         conn.commit()
 
