@@ -487,7 +487,7 @@ def main() -> None:
 
             if day.weekday() == 6:
                 score_weeks(conn=conn, week_end_date=day)
-                roster_moves.main()
+                roster_moves.main(log_date=day)
 
                 cursor = conn.cursor()
                 weekly_log.points.extend(log_points(cursor, day))

@@ -79,3 +79,4 @@ Statuses: not started, in progress, done, deferred.
 | REQ-078 | not started |  |  | Set up alerting for system failures. |
 | REQ-079 | not started |  |  | Run the simulation on 2024 and other seasons. |
 | REQ-080 | not started |  |  | Handle cases where players are dropped between the auction and the start of the season. |
+| REQ-081 | not started |  | Website | Decorate player cards with icons for achievements like two-way scoring. |

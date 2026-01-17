@@ -102,12 +102,12 @@ def order_teams(team_info):
     return ordered
 
 
-def write_log(entries, processed_count):
+def write_log(entries, processed_count, log_date=None):
     LOGS_DIR.mkdir(parents=True, exist_ok=True)
-    today = datetime.now(EASTERN_TZ).date().isoformat()
-    log_path = LOGS_DIR / f"roster-moves-{today}.md"
+    target_date = log_date or datetime.now(EASTERN_TZ).date()
+    log_path = LOGS_DIR / f"roster-moves-{target_date.isoformat()}.md"
     lines = [
-        f"# Roster move processing: {today}",
+        f"# Roster move processing: {target_date.isoformat()}",
         "",
         f"- Processed requests: {processed_count}",
         "",
@@ -117,7 +117,7 @@ def write_log(entries, processed_count):
     return log_path
 
 
-def main():
+def main(log_date=None):
     if not os.getenv("DATABASE_URL"):
         raise SystemExit("DATABASE_URL is not set.")
 
@@ -131,7 +131,7 @@ def main():
         points_by_team = load_team_points(cursor)
         pending_by_team = load_pending_requests(cursor)
         if not pending_by_team:
-            write_log(["No pending roster move requests."], 0)
+            write_log(["No pending roster move requests."], 0, log_date=log_date)
             print("No pending roster move requests.")
             return
 
@@ -244,7 +244,7 @@ def main():
 
         conn.commit()
 
-    log_path = write_log(log_entries, processed)
+    log_path = write_log(log_entries, processed, log_date=log_date)
     print(f"Processed {processed} roster move requests.")
     print(f"Wrote log to {log_path}")
 

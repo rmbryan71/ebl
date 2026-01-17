@@ -1,9 +1,9 @@
 {
-  "captured_at": "2026-01-17T13:21:15.380564+00:00",
-  "end_date": "2025-04-09",
+  "captured_at": "2026-01-17T14:28:26.109234+00:00",
+  "end_date": "2025-04-21",
   "notes": "",
   "schema_version": 1,
   "season": 2025,
   "source": "mlb_statsapi",
-  "start_date": "2025-03-17"
+  "start_date": "2025-04-10"
 }

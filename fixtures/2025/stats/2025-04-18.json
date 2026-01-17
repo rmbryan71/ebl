@@ -1,0 +1,65 @@
+{
+  "date": "2025-04-18",
+  "players": [
+    {
+      "mlb_player_id": 547180,
+      "offense": 5,
+      "outs": 0
+    },
+    {
+      "mlb_player_id": 554430,
+      "offense": 0,
+      "outs": 21
+    },
+    {
+      "mlb_player_id": 592206,
+      "offense": 3,
+      "outs": 0
+    },
+    {
+      "mlb_player_id": 592663,
+      "offense": 1,
+      "outs": 0
+    },
+    {
+      "mlb_player_id": 596146,
+      "offense": 1,
+      "outs": 0
+    },
+    {
+      "mlb_player_id": 607208,
+      "offense": 1,
+      "outs": 0
+    },
+    {
+      "mlb_player_id": 614179,
+      "offense": 0,
+      "outs": 3
+    },
+    {
+      "mlb_player_id": 621383,
+      "offense": 0,
+      "outs": 3
+    },
+    {
+      "mlb_player_id": 656941,
+      "offense": 5,
+      "outs": 0
+    },
+    {
+      "mlb_player_id": 664761,
+      "offense": 1,
+      "outs": 0
+    },
+    {
+      "mlb_player_id": 679032,
+      "offense": 2,
+      "outs": 0
+    },
+    {
+      "mlb_player_id": 681082,
+      "offense": 1,
+      "outs": 0
+    }
+  ]
+}
