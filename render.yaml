@@ -9,10 +9,10 @@ services:
         value: America/New_York
 
 cronjobs:
-  - name: nightly-roster-sync
+  - name: nightly-roster-check
     schedule: "30 3 * * *"
     env: python
-    command: python roster-sync.py
+    command: python roster-check.py
     envVars:
       - key: TZ
         value: America/New_York

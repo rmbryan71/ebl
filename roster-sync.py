@@ -1,18 +1,12 @@
 from datetime import datetime, timezone
 from pymlb_statsapi import api
 
-from db import get_connection, ensure_identities
+from db import ensure_identities
 
 PHILLIES_TEAM_ID = 143
 
 
-def sync_phillies_40_man(roster_date=None):
-    conn = get_connection()
-    cursor = conn.cursor()
-    ensure_identities(conn, ["players"])
-
-    active_mlb_ids = set()
-
+def fetch_roster_mlb_ids(roster_date=None):
     roster_params = {
         "teamId": PHILLIES_TEAM_ID,
         "rosterType": "40Man",
@@ -22,173 +16,170 @@ def sync_phillies_40_man(roster_date=None):
     roster_resp = api.Team.roster(**roster_params)
     roster_json = roster_resp.json()
     roster_rows = roster_json.get("roster", [])
+    return [int(row["person"]["id"]) for row in roster_rows]
 
-    for r in roster_rows:
-        mlb_id = int(r["person"]["id"])
-        active_mlb_ids.add(mlb_id)
 
+def insert_new_player(cursor, person):
+    position = person.get("primaryPosition", {})
+    bat_side = person.get("batSide", {})
+    throw_side = person.get("pitchHand", {})
+    cursor.execute(
+        """
+        INSERT INTO players (
+            mlb_id,
+            name,
+            first_name,
+            last_name,
+            name_slug,
+            position_code,
+            position_name,
+            position_type,
+            bat_side,
+            throw_side,
+            jersey_number,
+            status,
+            birth_date,
+            birth_city,
+            birth_state,
+            birth_country,
+            height,
+            weight,
+            is_active,
+            last_updated
+        )
+        VALUES (
+            %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,%s
+        )
+        ON CONFLICT(mlb_id) DO NOTHING
+        """,
+        (
+            int(person["id"]),
+            person.get("fullName"),
+            person.get("firstName"),
+            person.get("lastName"),
+            person.get("nameSlug"),
+            position.get("code"),
+            position.get("name"),
+            position.get("type"),
+            bat_side.get("code"),
+            throw_side.get("code"),
+            int(person["primaryNumber"]) if person.get("primaryNumber") else None,
+            person.get("status", {}).get("description"),
+            person.get("birthDate"),
+            person.get("birthCity"),
+            person.get("birthStateProvince"),
+            person.get("birthCountry"),
+            person.get("height"),
+            int(person.get("weight") or 0) if person.get("weight") else None,
+            datetime.now(timezone.utc).isoformat(sep=" "),
+        ),
+    )
+
+
+def sync_players(conn, roster_date=None, roster_ids=None):
+    cursor = conn.cursor()
+    ensure_identities(conn, ["players"])
+    roster_ids = roster_ids or fetch_roster_mlb_ids(roster_date)
+    roster_ids_set = set(roster_ids)
+
+    cursor.execute("SELECT mlb_id FROM players")
+    existing_ids = {row["mlb_id"] for row in cursor.fetchall()}
+    new_ids = roster_ids_set - existing_ids
+
+    for mlb_id in sorted(new_ids):
         person_resp = api.Person.person(personIds=mlb_id)
-        person = person_resp.json()["people"][0]
+        people = person_resp.json().get("people", [])
+        if not people:
+            continue
+        insert_new_player(cursor, people[0])
 
-        position = person.get("primaryPosition", {})
-        bat_side = person.get("batSide", {})
-        throw_side = person.get("pitchHand", {})
-
+    now = datetime.now(timezone.utc).isoformat(sep=" ")
+    if roster_ids:
         cursor.execute(
             """
-            INSERT INTO players (
-                mlb_id,
-                name,
-                first_name,
-                last_name,
-                name_slug,
-                position_code,
-                position_name,
-                position_type,
-                bat_side,
-                throw_side,
-                jersey_number,
-                status,
-                birth_date,
-                birth_city,
-                birth_state,
-                birth_country,
-                height,
-                weight,
-                is_active,
-                last_updated
-            )
-            VALUES (
-                %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,1,%s
-            )
-            ON CONFLICT(mlb_id) DO UPDATE SET
-                name              = excluded.name,
-                first_name        = excluded.first_name,
-                last_name         = excluded.last_name,
-                name_slug         = excluded.name_slug,
-                position_code     = excluded.position_code,
-                position_name     = excluded.position_name,
-                position_type     = excluded.position_type,
-                bat_side          = excluded.bat_side,
-                throw_side        = excluded.throw_side,
-                jersey_number     = excluded.jersey_number,
-                status            = excluded.status,
-                birth_date        = excluded.birth_date,
-                birth_city        = excluded.birth_city,
-                birth_state       = excluded.birth_state,
-                birth_country     = excluded.birth_country,
-                height            = excluded.height,
-                weight            = excluded.weight,
-                is_active         = 1,
-                last_updated      = excluded.last_updated;
+            UPDATE players
+            SET is_active = 1,
+                last_updated = %s
+            WHERE mlb_id = ANY(%s)
             """,
-            (
-                mlb_id,
-                person.get("fullName"),
-                person.get("firstName"),
-                person.get("lastName"),
-                person.get("nameSlug"),
-                position.get("code"),
-                position.get("name"),
-                position.get("type"),
-                bat_side.get("code"),
-                throw_side.get("code"),
-                int(person["primaryNumber"]) if person.get("primaryNumber") else None,
-                person.get("status", {}).get("description"),
-                person.get("birthDate"),
-                person.get("birthCity"),
-                person.get("birthStateProvince"),
-                person.get("birthCountry"),
-                person.get("height"),
-                int(person.get("weight") or 0) if person.get("weight") else None,
-                datetime.now(timezone.utc).isoformat(sep=" "),
-            ),
+            (now, roster_ids),
         )
-
-    if active_mlb_ids:
-        placeholders = ",".join(["%s"] * len(active_mlb_ids))
-        deactivated_at = datetime.now(timezone.utc).isoformat(sep=" ")
         cursor.execute(
-            f"""
+            """
             UPDATE players
             SET is_active = 0,
                 last_updated = %s
             WHERE is_active = 1
-              AND mlb_id NOT IN ({placeholders})
-            RETURNING mlb_id
+              AND NOT (mlb_id = ANY(%s))
             """,
-            (deactivated_at, *active_mlb_ids),
+            (now, roster_ids),
         )
-        removed_player_ids = [row["mlb_id"] for row in cursor.fetchall()]
-        if removed_player_ids:
-            removed_placeholders = ",".join(["%s"] * len(removed_player_ids))
-            cursor.execute(
-                f"""
-                SELECT player_mlb_id, team_id
-                FROM team_player
-                WHERE player_mlb_id IN ({removed_placeholders})
-                """,
-                removed_player_ids,
+
+    return roster_ids_set
+
+
+def apply_mlb_roster_changes(conn, before_set, after_set, change_date, source="snapshot"):
+    cursor = conn.cursor()
+    added = sorted(after_set - before_set)
+    removed = sorted(before_set - after_set)
+
+    change_rows = []
+    for mlb_id in added:
+        change_rows.append((mlb_id, change_date, "add", source, None))
+    for mlb_id in removed:
+        change_rows.append((mlb_id, change_date, "remove", source, None))
+    if change_rows:
+        cursor.executemany(
+            """
+            INSERT INTO mlb_roster_changes (
+                player_mlb_id,
+                change_date,
+                change_type,
+                source,
+                notes
             )
-            assignments = cursor.fetchall()
-            if assignments:
-                cursor.executemany(
-                    """
-                    INSERT INTO alumni (player_mlb_id, team_id, deactivated_at)
-                    VALUES (%s, %s, %s)
-                    """,
-                    [
-                        (row["player_mlb_id"], row["team_id"], deactivated_at)
-                        for row in assignments
-                    ],
-                )
-            cursor.execute(
-                f"""
-                UPDATE teams
-                SET has_empty_roster_spot = 1
-                WHERE id IN (
-                    SELECT team_id
-                    FROM team_player
-                    WHERE player_mlb_id IN ({removed_placeholders})
-                )
-                """,
-                removed_player_ids,
-            )
-            cursor.execute(
-                f"""
-                DELETE FROM team_player
-                WHERE player_mlb_id IN ({removed_placeholders})
-                """,
-                removed_player_ids,
-            )
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (player_mlb_id, change_date, change_type) DO NOTHING
+            """,
+            change_rows,
+        )
+
+    if not removed:
+        return
 
     cursor.execute(
         """
-        UPDATE teams
-        SET has_empty_roster_spot = 1
-        WHERE id IN (
-            SELECT tp.team_id
-            FROM team_player tp
-            JOIN players p ON p.mlb_id = tp.player_mlb_id
-            WHERE p.is_active = 0
-        )
-        """
+        SELECT player_mlb_id, team_id
+        FROM team_player
+        WHERE player_mlb_id = ANY(%s)
+        """,
+        (removed,),
     )
+    assignments = cursor.fetchall()
+    if assignments:
+        deactivated_at = datetime.now(timezone.utc).isoformat(sep=" ")
+        cursor.executemany(
+            """
+            INSERT INTO alumni (player_mlb_id, team_id, deactivated_at)
+            VALUES (%s, %s, %s)
+            """,
+            [
+                (row["player_mlb_id"], row["team_id"], deactivated_at)
+                for row in assignments
+            ],
+        )
+        cursor.execute(
+            """
+            UPDATE teams
+            SET has_empty_roster_spot = 1
+            WHERE id = ANY(%s)
+            """,
+            ([row["team_id"] for row in assignments],),
+        )
     cursor.execute(
-        """
-        DELETE FROM team_player
-        WHERE player_mlb_id IN (
-            SELECT mlb_id
-            FROM players
-            WHERE is_active = 0
-        )
-        """
+        "DELETE FROM team_player WHERE player_mlb_id = ANY(%s)",
+        (removed,),
     )
-
-    conn.commit()
-    conn.close()
-
-    print(f"Roster sync complete: {len(active_mlb_ids)} active players.")
 
 
 if __name__ == "__main__":
@@ -204,4 +195,11 @@ if __name__ == "__main__":
             continue
         roster_date = roster_input
         break
-    sync_phillies_40_man(roster_date=roster_date)
+
+    from db import get_connection
+
+    with get_connection() as conn:
+        sync_players(conn, roster_date=roster_date)
+        conn.commit()
+
+    print("Roster sync complete (players only).")

@@ -110,7 +110,9 @@ def run_day(day, dry_run, roster_sync, stats_populate, scoring, roster_moves):
     if dry_run:
         print(f"[{label}] dry-run: roster sync + stats populate")
     else:
-        roster_sync.sync_phillies_40_man(roster_date=label)
+        with get_connection() as conn:
+            roster_sync.sync_players(conn, roster_date=label)
+            conn.commit()
         stats_populate.populate_2025_stats(start_date=day, end_date=day)
 
     if day.weekday() == 6:

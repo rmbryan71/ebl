@@ -107,4 +107,8 @@ Add a new table named **`mlb_roster_changes`** that records roster adds/removes 
 
 ## Execution Notes
 
-When execution begins, add a detailed, timestamped list of all changes, commands, and outcomes here.
+2026-01-17 03:30 EST - Added `roster-check.py` to compare active MLB IDs vs API roster, retry API calls, and trigger `sync_players()` + `apply_mlb_roster_changes()` inside one transaction.  
+2026-01-17 03:30 EST - Refactored `roster-sync.py` into `fetch_roster_mlb_ids()`, `sync_players()` (players table only), and `apply_mlb_roster_changes()` (writes `mlb_roster_changes`, removes team assignments, sets `has_empty_roster_spot`, inserts alumni).  
+2026-01-17 03:30 EST - Updated `db-init.py` to add `mlb_roster_changes` table, unique constraint, indexes, and audit trigger; removed transaction-sync table usage.  
+2026-01-17 03:30 EST - Updated `render.yaml` to replace nightly `roster-sync.py` cron with nightly `roster-check.py`.  
+2026-01-17 03:30 EST - Added DB integration tests for `apply_mlb_roster_changes` and audit triggers; updated existing DB integration test to include `mlb_roster_changes`.  

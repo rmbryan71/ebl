@@ -4,6 +4,11 @@
 - Use AI to speed up development while keeping code quality and security high.
 - Maintain human ownership of decisions, reviews, and releases.
 
+## Planning preferences
+- Spend extra time on problem definition, scope, and decomposition during planning.
+- Present decisions one at a time with pros/cons and recommendations that prioritize simplicity and stability.
+- Note that small, one-step fixes do not require plans; decide when complexity warrants a plan.
+
 ## When to use AI
 - Brainstorming approaches, edge cases, and testing ideas.
 - Drafting code changes with clear acceptance criteria.
@@ -22,7 +27,10 @@
 - Treat AI output like a junior developer draft.
 - Verify correctness, security, and style before merging.
 - Run tests or spot-check critical paths.
+
+## Commit preferences
 - Prompt for a commit before executing multi-step plans.
+- Prompt for a commit immediately after plans execute.
 
 ## Data handling
 - Redact or anonymize sensitive data before sharing.
