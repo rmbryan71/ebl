@@ -14,6 +14,7 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 7:00 PM - next 30-minutes overhaul how mlb transactions and roster moves are handled.
 7:30 PM - transaction handling overhaul. next 30 minutes on strategy, planning and implementation.
 8:00 PM - Generating local player ids was a choice with disadvantages. I'm changing to use the mlb player ids instead because they never change.
+8:25 PM - Losing focus. Not going to push to prod now. Next time, start with the roster change handling plan.
 
 
 
