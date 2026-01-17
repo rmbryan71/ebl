@@ -64,18 +64,23 @@ def award_points_for_category(team_totals, points_map):
     return awards
 
 
-def score_weeks():
-    with get_connection() as conn:
+def score_weeks(conn=None, week_end_date=None):
+    own_conn = conn is None
+    if own_conn:
+        conn = get_connection()
+    try:
         cursor = conn.cursor()
         ensure_identities(conn, ["points"])
         weekly = load_weekly_totals(conn)
         point_rows = []
         for week_start_date, team_totals in weekly.items():
-            week_end_date = week_end(week_start_date)
+            candidate_end = week_end(week_start_date)
+            if week_end_date and candidate_end != week_end_date:
+                continue
 
             cursor.execute(
                 "SELECT COUNT(*) AS count FROM points WHERE date = %s",
-                (week_end_date.isoformat(),),
+                (candidate_end.isoformat(),),
             )
             if cursor.fetchone()["count"] > 0:
                 continue
@@ -91,14 +96,14 @@ def score_weeks():
                 offense_totals, OFFENSE_POINTS
             ):
                 point_rows.append(
-                    (team_id, week_end_date.isoformat(), points, "offense")
+                    (team_id, candidate_end.isoformat(), points, "offense")
                 )
 
             for team_id, points in award_points_for_category(
                 pitching_totals, DEFENSE_POINTS
             ):
                 point_rows.append(
-                    (team_id, week_end_date.isoformat(), points, "defense")
+                    (team_id, candidate_end.isoformat(), points, "defense")
                 )
 
         if point_rows:
@@ -110,6 +115,9 @@ def score_weeks():
                 point_rows,
             )
         conn.commit()
+    finally:
+        if own_conn:
+            conn.close()
 
     print(f"Awarded {len(point_rows)} point rows.")
 

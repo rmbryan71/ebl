@@ -413,6 +413,14 @@ def main() -> None:
         roster_moves = load_module("roster_moves", "roster-moves.py")
         roster_sync = load_module("roster_sync", "roster-sync.py")
 
+        with conn.transaction():
+            cursor = conn.cursor()
+            clear_end = end_date + timedelta(days=6)
+            cursor.execute(
+                "DELETE FROM points WHERE date BETWEEN %s AND %s",
+                (start_date.isoformat(), clear_end.isoformat()),
+            )
+
         for day in iter_dates(start_date, end_date):
             if weekly_log is None:
                 week_start = day - timedelta(days=day.weekday())
@@ -430,6 +438,7 @@ def main() -> None:
 
             try:
                 with conn.transaction():
+                    set_audit_user_id(conn, 0)
                     ensure_players(conn, roster_players, now_ts)
 
                     before_set = prev_roster_ids or set()
@@ -477,7 +486,7 @@ def main() -> None:
             prev_roster_ids = roster_ids
 
             if day.weekday() == 6:
-                score_weeks()
+                score_weeks(conn=conn, week_end_date=day)
                 roster_moves.main()
 
                 cursor = conn.cursor()
