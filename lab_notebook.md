@@ -10,6 +10,7 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 7:07 AM - Settled in. I'm going to spend the next 40 minutes working on the 2025 season simulation.
 8:40 AM - I forgot to start the timer. The simulation is finding bugs, and I'm fixing them. I'll keep going with that.
 9:40 AM - Taking a break.
+11:45 AM - Time for a prod deploy.
 
 
 
