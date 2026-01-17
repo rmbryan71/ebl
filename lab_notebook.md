@@ -1,6 +1,11 @@
 # Introduction
 This is where I keep track of what I'm thinking and doing related to the Experimental Baseball League.
 
+# January 17, 2026
+2:00 AM - I'm going to work on the roster change handling plan for 45 minutes starting now.
+2:45 AM - Good progress. New workflow is to collaborate with AI on documenting a plan first, refining the plan until I understand what it's going to do and how it's going to work. Asking for a list of decisions with pros, cons, and recommendations helps. Next 45 minutes continue to focus on mlb roster change handling.
+
+
 # January 16, 2026
 2:40 AM - As I work, I have ideas for other projects that I want to do after the Experimental Baseball League is up and running. Currently, that's motivating me to work a lot. This morning, I'm going to focus on implementing the rest of the roster move process, then automated testing.
 4:00 AM - I have a start on code to handle when players leave the MLB Phillies. Also, I have test data setup that creates user accounts for 8 team owners, and opens a browser window for each owner, logged in as that owner, navigated to their team page so that I can start testing roster moves. Next, I need to step through the 2025 season one week at a time write test scripts to handle MLB roster changes, EBL roster changes, open roster spots and the roster move request process.
