@@ -12,6 +12,8 @@ sys.path.append(str(ROOT))
 from db import get_connection
 
 TEST_LEAGUE_PATH = ROOT / "test-league.md"
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@example.com")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "adminpass")
 
 
 def load_test_league(path):
@@ -25,6 +27,17 @@ def load_test_league(path):
         if current in sections and line.startswith("- "):
             sections[current].append(line[2:].strip())
     return sections
+
+
+def login_and_open(page, base_url, email, password, destination, title):
+    page.goto(f"{base_url}/login", wait_until="domcontentloaded")
+    page.fill('input[name="email"]', email)
+    page.fill('input[name="password"]', password)
+    page.click('button[type="submit"]')
+    page.wait_for_load_state("domcontentloaded")
+    page.goto(f"{base_url}{destination}", wait_until="domcontentloaded")
+    safe_title = re.sub(r"[^A-Za-z0-9_-]+", "-", title).strip("-")
+    page.evaluate(f"document.title = '{safe_title}'")
 
 
 def main():
@@ -54,22 +67,35 @@ def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=False)
         contexts = []
+
+        admin_context = browser.new_context()
+        admin_page = admin_context.new_page()
+        login_and_open(
+            admin_page,
+            base_url,
+            ADMIN_EMAIL,
+            ADMIN_PASSWORD,
+            "/pending-roster-moves",
+            "EBL Admin",
+        )
+        contexts.append(admin_context)
+
         for idx, email in enumerate(emails):
             context = browser.new_context()
             page = context.new_page()
-            page.goto(f"{base_url}/login", wait_until="domcontentloaded")
-            page.fill('input[name="email"]', email)
-            page.fill('input[name="password"]', passwords[idx])
-            page.click('button[type="submit"]')
-            page.wait_for_load_state("domcontentloaded")
             team_id = team_by_email.get(email)
-            if team_id:
-                page.goto(f"{base_url}/team?team_id={team_id}", wait_until="domcontentloaded")
-            safe_name = re.sub(r"[^A-Za-z0-9_-]+", "-", team_names[idx]).strip("-")
-            page.evaluate(f"document.title = 'EBL {safe_name}'")
+            destination = f"/team?team_id={team_id}" if team_id else "/"
+            login_and_open(
+                page,
+                base_url,
+                email,
+                passwords[idx],
+                destination,
+                f"EBL {team_names[idx]}",
+            )
             contexts.append(context)
 
-        print("Launched sessions for all teams. Press Ctrl+C to close.")
+        print("Launched sessions for all teams plus admin. Press Ctrl+C to close.")
         try:
             while True:
                 time.sleep(1)

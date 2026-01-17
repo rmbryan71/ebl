@@ -63,7 +63,7 @@ def load_available_players(cursor):
         WHERE p.is_active = 1 AND tp.player_mlb_id IS NULL
         """
     )
-    return {row["id"] for row in cursor.fetchall()}
+    return {row["mlb_id"] for row in cursor.fetchall()}
 
 
 def load_team_roster(cursor, team_id):
