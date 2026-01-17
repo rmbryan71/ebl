@@ -77,3 +77,4 @@ Statuses: not started, in progress, done, deferred.
 | REQ-076 | not started |  |  | Refactor player table to be immutable. |
 | REQ-077 | in progress |  | Documentation | Document AI-assisted development workflow best practices. |
 | REQ-078 | not started |  |  | Set up alerting for system failures. |
+| REQ-079 | not started |  |  | Run the simulation on 2024 and other seasons. |

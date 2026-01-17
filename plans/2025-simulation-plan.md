@@ -18,6 +18,8 @@ We need a reliable way to simulate the 2025 MLB season in EBL so we can test ros
 10. Include safety guards to prevent running against production data (explicit env/flag checks).
 11. Support a clean reset that removes all simulation artifacts (logs, fixtures, and any DB changes made by the simulation).
 12. Ensure simulation scripts cannot be invoked by production cron jobs or users (explicit permissions and environment gating).
+13. Enforce ET date handling for roster and stats fixtures (document and validate in code).
+14. Safety denylist: simulations only allowed on local environments; explicitly block Render.
 
 ## Decisions
 1. Primary purpose: correctness-focused.
@@ -36,6 +38,17 @@ We need a reliable way to simulate the 2025 MLB season in EBL so we can test ros
 14. Logging: weekly logs at `logs/simulations/weekly-YYYY-MM-DD.md`.
 15. Safety guard: require `SIMULATION_MODE=1` env var.
 16. Reset strategy: dedicated reset command to remove fixtures/logs and simulation DB artifacts.
+17. Weekly log content: points, roster moves, roster-change events, errors/anomalies, weekly summary.
+18. Logs include a final season summary.
+19. Log format: Markdown.
+20. Weekly log ordering: grouped sections (not chronological).
+21. Weekly log naming: include week date range (e.g., `weekly-YYYY-MM-DD_to_YYYY-MM-DD.md`).
+22. Log retention: overwrite existing week logs on rerun.
+23. Failure logging: write failures both in weekly logs and a separate error log per run.
+24. Local-only allowlist: only `localhost`, `127.0.0.1`, or unix socket (`host=/tmp`) in `DATABASE_URL`.
+25. Cleanup strategy: no tagging; reset script truncates affected tables.
+26. Weekly log template: detailed sections (Summary, Points, Roster Moves with per-team breakdown, Roster Changes with adds/removes, Auto-move actions, Errors).
+27. Error logs: `logs/simulations/errors/run-YYYY-MM-DD_HHMMSS.md`.
 
 ## Next steps
 1. Draft implementation steps for capture and replay.
@@ -75,12 +88,12 @@ We need a reliable way to simulate the 2025 MLB season in EBL so we can test ros
 
 ## Reset + safety guards
 1. Add a reset script (e.g., `scripts/reset_simulation.py`) that:
-   - Deletes `fixtures/2025/` and `logs/simulations/`.
+   - Deletes `fixtures/2025/` and `logs/simulations/` (except `logs/simulations/errors/`).
    - Clears simulation-created DB data (pending roster moves, stats, points).
    - Requires `SIMULATION_MODE=1` to run.
 2. Ensure capture, replay, and reset scripts all refuse to run if:
    - `SIMULATION_MODE` is not set.
-   - `DATABASE_URL` points to production (explicit denylist check).
+   - `DATABASE_URL` points to Render or any non-local host (explicit denylist check).
 
 ## Execution plan
 1. Define fixture schemas and add a `manifest.json` schema version.
@@ -90,3 +103,16 @@ We need a reliable way to simulate the 2025 MLB season in EBL so we can test ros
 5. Add safety guard checks to all three scripts (env + denylist).
 6. Add targeted tests for fixture parsing and roster-move auto-response.
 7. Run a 2-week replay and verify weekly logs and points totals.
+8. Add ET date validation to capture/replay and document behavior.
+9. Tag simulation-created rows (e.g., `source='simulation'`) to support clean reset.
+10. Implement and test the Render denylist guard (block non-local DATABASE_URL).
+
+## Fixture schema plan
+1. `fixtures/2025/manifest.json`
+   - Fields: `schema_version`, `season`, `start_date`, `end_date`, `captured_at`, `source`, `notes`.
+2. `fixtures/2025/roster/YYYY-MM-DD.json`
+   - Fields: `date`, `team_id`, `mlb_player_ids` (array of ints).
+3. `fixtures/2025/stats/YYYY-MM-DD.json`
+   - Fields: `date`, `players` (array of objects with `mlb_player_id`, `outs`, `offense`).
+4. Validate schema on capture and replay; fail fast with a clear error.
+5. Validate `date` fields are interpreted as ET dates (no time component).
