@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import argparse
 import shutil
+import sys
 from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from db import get_connection
 from simulation_fixtures import require_local_simulation
@@ -33,8 +38,9 @@ def reset_database() -> None:
         cursor = conn.cursor()
         cursor.execute("TRUNCATE stats")
         cursor.execute("TRUNCATE points")
-        cursor.execute("TRUNCATE roster_move_request_players")
-        cursor.execute("TRUNCATE roster_move_requests")
+        cursor.execute(
+            "TRUNCATE roster_move_request_players, roster_move_requests"
+        )
         cursor.execute("TRUNCATE mlb_roster_changes")
         cursor.execute("TRUNCATE alumni")
         cursor.execute("TRUNCATE team_player")

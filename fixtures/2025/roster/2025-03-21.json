@@ -1,0 +1,328 @@
+{
+  "date": "2025-03-21",
+  "mlb_player_ids": [
+    547180,
+    554430,
+    592206,
+    592663,
+    592836,
+    596117,
+    596146,
+    605400,
+    605447,
+    605452,
+    607208,
+    614179,
+    621237,
+    621381,
+    621383,
+    624133,
+    624641,
+    642215,
+    650911,
+    656941,
+    660604,
+    663969,
+    664761,
+    665019,
+    665561,
+    666200,
+    667725,
+    669016,
+    670276,
+    671083,
+    675650,
+    676661,
+    679032,
+    681082,
+    682967,
+    686751,
+    689147,
+    690953,
+    691330,
+    691893
+  ],
+  "players": [
+    {
+      "mlb_player_id": 547180,
+      "name": "Bryce Harper",
+      "position_code": "3",
+      "position_name": "First Base",
+      "position_type": "Infielder"
+    },
+    {
+      "mlb_player_id": 554430,
+      "name": "Zack Wheeler",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 592206,
+      "name": "Nick Castellanos",
+      "position_code": "9",
+      "position_name": "Outfielder",
+      "position_type": "Outfielder"
+    },
+    {
+      "mlb_player_id": 592663,
+      "name": "J.T. Realmuto",
+      "position_code": "2",
+      "position_name": "Catcher",
+      "position_type": "Catcher"
+    },
+    {
+      "mlb_player_id": 592836,
+      "name": "Taijuan Walker",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 596117,
+      "name": "Garrett Stubbs",
+      "position_code": "2",
+      "position_name": "Catcher",
+      "position_type": "Catcher"
+    },
+    {
+      "mlb_player_id": 596146,
+      "name": "Max Kepler",
+      "position_code": "9",
+      "position_name": "Outfielder",
+      "position_type": "Outfielder"
+    },
+    {
+      "mlb_player_id": 605400,
+      "name": "Aaron Nola",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 605447,
+      "name": "Jordan Romano",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 605452,
+      "name": "Joe Ross",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 607208,
+      "name": "Trea Turner",
+      "position_code": "6",
+      "position_name": "Shortstop",
+      "position_type": "Infielder"
+    },
+    {
+      "mlb_player_id": 614179,
+      "name": "Jos\u00e9 Ruiz",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 621237,
+      "name": "Jos\u00e9 Alvarado",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 621381,
+      "name": "Matt Strahm",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 621383,
+      "name": "Tanner Banks",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 624133,
+      "name": "Ranger Su\u00e1rez",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 624641,
+      "name": "Edmundo Sosa",
+      "position_code": "6",
+      "position_name": "Shortstop",
+      "position_type": "Infielder"
+    },
+    {
+      "mlb_player_id": 642215,
+      "name": "Weston Wilson",
+      "position_code": "7",
+      "position_name": "Outfielder",
+      "position_type": "Outfielder"
+    },
+    {
+      "mlb_player_id": 650911,
+      "name": "Cristopher S\u00e1nchez",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 656941,
+      "name": "Kyle Schwarber",
+      "position_code": "10",
+      "position_name": "Designated Hitter",
+      "position_type": "Hitter"
+    },
+    {
+      "mlb_player_id": 660604,
+      "name": "Alan Rangel",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 663969,
+      "name": "Tyler Phillips",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 664761,
+      "name": "Alec Bohm",
+      "position_code": "5",
+      "position_name": "Third Base",
+      "position_type": "Infielder"
+    },
+    {
+      "mlb_player_id": 665019,
+      "name": "Kody Clemens",
+      "position_code": "3",
+      "position_name": "First Base",
+      "position_type": "Infielder"
+    },
+    {
+      "mlb_player_id": 665561,
+      "name": "Rafael March\u00e1n",
+      "position_code": "2",
+      "position_name": "Catcher",
+      "position_type": "Catcher"
+    },
+    {
+      "mlb_player_id": 666200,
+      "name": "Jes\u00fas Luzardo",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 667725,
+      "name": "Kyle Tyler",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 669016,
+      "name": "Brandon Marsh",
+      "position_code": "7",
+      "position_name": "Outfielder",
+      "position_type": "Outfielder"
+    },
+    {
+      "mlb_player_id": 670276,
+      "name": "Cal Stevenson",
+      "position_code": "8",
+      "position_name": "Outfielder",
+      "position_type": "Outfielder"
+    },
+    {
+      "mlb_player_id": 671083,
+      "name": "Buddy Kennedy",
+      "position_code": "4",
+      "position_name": "Second Base",
+      "position_type": "Infielder"
+    },
+    {
+      "mlb_player_id": 675650,
+      "name": "Michael Mercado",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 676661,
+      "name": "Max Lazar",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 679032,
+      "name": "Johan Rojas",
+      "position_code": "8",
+      "position_name": "Outfielder",
+      "position_type": "Outfielder"
+    },
+    {
+      "mlb_player_id": 681082,
+      "name": "Bryson Stott",
+      "position_code": "4",
+      "position_name": "Second Base",
+      "position_type": "Infielder"
+    },
+    {
+      "mlb_player_id": 682967,
+      "name": "Devin Sweet",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 686751,
+      "name": "Seth Johnson",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 689147,
+      "name": "Orion Kerkering",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 690953,
+      "name": "Mick Abel",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 691330,
+      "name": "Mois\u00e9s Chace",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    },
+    {
+      "mlb_player_id": 691893,
+      "name": "Jean Cabrera",
+      "position_code": "1",
+      "position_name": "Pitcher",
+      "position_type": "Pitcher"
+    }
+  ],
+  "team_id": 143
+}

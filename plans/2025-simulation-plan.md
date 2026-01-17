@@ -153,5 +153,8 @@ Phase 5: Safety guard checks
 2026-01-17 07:42 EST - Added `require_local_simulation()` guard and wired it into capture/replay/reset scripts.
 Phase 6: Tests + validation runs
 2026-01-17 07:42 EST - Added `tests/test_simulation_fixtures.py` to validate fixture schemas.
+2026-01-17 08:01 EST - Captured fixtures for 2025-03-17 to 2025-04-09 and replayed the simulation; weekly logs and error logs are now written during replay runs.
+2026-01-17 08:01 EST - Added repo-root `sys.path` injection for capture/replay/reset scripts to avoid needing PYTHONPATH.
+2026-01-17 08:09 EST - Fixed reset truncation order, deduped roster IDs in capture, reran reset + db-init + capture + replay for 2025-03-17 to 2025-04-09.
 
 Add timestamped notes under each phase as work is completed.

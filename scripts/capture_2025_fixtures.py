@@ -2,11 +2,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import requests
 from pymlb_statsapi import api
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from simulation_fixtures import (
     SCHEMA_VERSION,
@@ -35,12 +40,17 @@ def fetch_roster_players(day: date) -> list[dict]:
     roster_json = roster_resp.json()
     roster_rows = roster_json.get("roster", [])
     players = []
+    seen_ids = set()
     for row in roster_rows:
         person = row.get("person", {})
+        mlb_id = int(person["id"])
+        if mlb_id in seen_ids:
+            continue
+        seen_ids.add(mlb_id)
         position = row.get("position", {})
         players.append(
             {
-                "mlb_player_id": int(person["id"]),
+                "mlb_player_id": mlb_id,
                 "name": person.get("fullName") or "",
                 "position_code": position.get("code"),
                 "position_name": position.get("name"),

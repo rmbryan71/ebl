@@ -2,14 +2,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 from db import ensure_identities, get_connection, set_audit_user_id
-from roster_sync import apply_mlb_roster_changes
 from scoring import score_weeks
 import importlib.util
 from simulation_fixtures import (
@@ -407,6 +411,7 @@ def main() -> None:
         set_audit_user_id(conn, 0)
 
         roster_moves = load_module("roster_moves", "roster-moves.py")
+        roster_sync = load_module("roster_sync", "roster-sync.py")
 
         for day in iter_dates(start_date, end_date):
             if weekly_log is None:
@@ -442,7 +447,7 @@ def main() -> None:
                         )
                         removed_team_rows = cursor.fetchall()
 
-                    apply_mlb_roster_changes(
+                    roster_sync.apply_mlb_roster_changes(
                         conn,
                         before_set,
                         roster_ids,
