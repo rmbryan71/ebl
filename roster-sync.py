@@ -19,6 +19,12 @@ def fetch_roster_mlb_ids(roster_date=None):
     return [int(row["person"]["id"]) for row in roster_rows]
 
 
+def load_active_mlb_ids(conn):
+    cursor = conn.cursor()
+    cursor.execute("SELECT mlb_id FROM players WHERE is_active = 1")
+    return {row["mlb_id"] for row in cursor.fetchall()}
+
+
 def insert_new_player(cursor, person):
     position = person.get("primaryPosition", {})
     bat_side = person.get("batSide", {})
@@ -199,7 +205,16 @@ if __name__ == "__main__":
     from db import get_connection
 
     with get_connection() as conn:
-        sync_players(conn, roster_date=roster_date)
+        before_set = load_active_mlb_ids(conn)
+        after_set = sync_players(conn, roster_date=roster_date)
+        change_date = roster_date or datetime.now(timezone.utc).date().isoformat()
+        apply_mlb_roster_changes(
+            conn,
+            before_set,
+            after_set,
+            change_date,
+            source="manual",
+        )
         conn.commit()
 
-    print("Roster sync complete (players only).")
+    print("Roster sync complete (players + roster changes).")

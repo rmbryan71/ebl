@@ -508,11 +508,11 @@ def load_leaderboard(week_start=None):
         selected_week_start = week_starts[0]
 
     params = []
-    date_filter = ""
+    join_filter = ""
     selected_week_end = None
     if selected_week_start:
         selected_week_end = selected_week_start + timedelta(days=6)
-        date_filter = "WHERE s.date BETWEEN %s AND %s"
+        join_filter = "AND s.date BETWEEN %s AND %s"
         params.extend([selected_week_start.isoformat(), selected_week_end.isoformat()])
 
     cursor.execute(
@@ -520,10 +520,11 @@ def load_leaderboard(week_start=None):
         SELECT
             t.id AS team_id,
             t.name AS team_name,
-            SUM(s.offense) AS total_offense
-        FROM stats s
-        JOIN teams t ON t.id = s.team_id
-        {date_filter}
+            COALESCE(SUM(s.offense), 0) AS total_offense
+        FROM teams t
+        LEFT JOIN stats s
+            ON s.team_id = t.id
+            {join_filter}
         GROUP BY t.id
         ORDER BY total_offense DESC, t.name
         """,
@@ -536,10 +537,11 @@ def load_leaderboard(week_start=None):
         SELECT
             t.id AS team_id,
             t.name AS team_name,
-            SUM(s.pitching) AS total_pitching
-        FROM stats s
-        JOIN teams t ON t.id = s.team_id
-        {date_filter}
+            COALESCE(SUM(s.pitching), 0) AS total_pitching
+        FROM teams t
+        LEFT JOIN stats s
+            ON s.team_id = t.id
+            {join_filter}
         GROUP BY t.id
         ORDER BY total_pitching DESC, t.name
         """,

@@ -8,7 +8,7 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 3:49 AM - Next 45-minutes to focus on simulating the 2025 season for testing.
 4:35 AM - I didn't realize that simulating a season would be almost as complicated as implementing mlb roster change handling, but it is. I'm working on a plan, still. Going to end this session. Next time, continue working on 2025 simulation plan. I haven't done a push in a long time. I'm 33 commits ahead of main. I should definitely be on a branch.
 7:07 AM - Settled in. I'm going to spend the next 40 minutes working on the 2025 season simulation.
-8:40 AM - I forgot to start the timer. The simulation is finding bugs and I'm fixing them. I'll keep going with that.
+8:40 AM - I forgot to start the timer. The simulation is finding bugs, and I'm fixing them. I'll keep going with that.
 
 
 
