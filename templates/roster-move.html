@@ -102,23 +102,5 @@
       </section>
     </main>
 
-    <script>
-      const selects = Array.from(document.querySelectorAll(".roster-move-select"));
-      const resetSelects = () => {
-        selects.forEach((el) => {
-          el.value = "";
-        });
-      };
-
-      selects.forEach((select) => {
-        select.addEventListener("change", () => {
-          const chosen = selects.map((el) => el.value).filter(Boolean);
-          const unique = new Set(chosen);
-          if (chosen.length !== unique.size) {
-            resetSelects();
-          }
-        });
-      });
-    </script>
   </body>
 </html>
