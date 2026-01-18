@@ -14,6 +14,7 @@ This is where I keep track of what I'm thinking and doing related to the Experim
 1:50 PM - We are live. People are logging in and submitting roster move requests. Well, not people, technically. A person.  
 8:20 PM - Going to work for 45 minutes on cleaning up little bugs and fixing documentation.
 9:05 PM - Adding a count of active people on the website to the home page for large screens. 45 more minutes, then I'm done for the day.
+9:30 PM - Prod deploy happening.
 
 
 

@@ -12,7 +12,7 @@ services:
     name: nightly-roster-check
     schedule: "30 3 * * *"
     env: python
-    command: python roster-check.py
+    startCommand: python roster-check.py
     envVars:
       - key: TZ
         value: America/New_York
@@ -21,7 +21,7 @@ services:
     name: weekly-scoring
     schedule: "0 4 * * 0"
     env: python
-    command: python scoring.py
+    startCommand: python scoring.py
     envVars:
       - key: TZ
         value: America/New_York
@@ -30,7 +30,7 @@ services:
     name: weekly-roster-moves
     schedule: "10 4 * * 0"
     env: python
-    command: python roster-moves.py
+    startCommand: python roster-moves.py
     envVars:
       - key: TZ
         value: America/New_York
