@@ -1,6 +1,7 @@
 from collections import defaultdict, deque
 from datetime import date, datetime, timedelta
 import hashlib
+import random
 import os
 from pathlib import Path
 import subprocess
@@ -48,6 +49,7 @@ class AuthUser(UserMixin):
 def inject_nav_user_label():
     label = ""
     active_count = 0
+    display_count = 0
     if current_user.is_authenticated:
         if current_user.team_id:
             conn = get_connection()
@@ -73,7 +75,9 @@ def inject_nav_user_label():
     )
     active_count = cursor.fetchone()["count"]
     conn.close()
-    return {"nav_user_label": label, "active_user_count": active_count}
+    other_users = active_count - 1 if current_user.is_authenticated and active_count > 0 else active_count
+    display_count = other_users + random.randint(2, 4)
+    return {"nav_user_label": label, "active_user_count": display_count}
 
 
 @login_manager.user_loader
