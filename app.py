@@ -75,7 +75,7 @@ def inject_nav_user_label():
     active_count = cursor.fetchone()["count"]
     conn.close()
     other_users = active_count - 1 if current_user.is_authenticated and active_count > 0 else active_count
-    return {"nav_user_label": label, "active_user_count": other_users}
+    return {"nav_user_label": label, "active_user_count": other_users + 1}
 
 
 @login_manager.user_loader
