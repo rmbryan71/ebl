@@ -69,9 +69,9 @@ def inject_nav_user_label():
         """
         SELECT COUNT(*) AS count
         FROM active_sessions
-        WHERE last_seen_at >= (CURRENT_TIMESTAMP - INTERVAL %s)
+        WHERE last_seen_at >= (CURRENT_TIMESTAMP - (%s * INTERVAL '1 minute'))
         """,
-        (f"{ACTIVE_WINDOW_MINUTES} minutes",),
+        (ACTIVE_WINDOW_MINUTES,),
     )
     active_count = cursor.fetchone()["count"]
     conn.close()
@@ -220,9 +220,9 @@ def heartbeat():
     cursor.execute(
         """
         DELETE FROM active_sessions
-        WHERE last_seen_at < (CURRENT_TIMESTAMP - INTERVAL %s)
+        WHERE last_seen_at < (CURRENT_TIMESTAMP - (%s * INTERVAL '1 hour'))
         """,
-        (f"{ACTIVE_CLEANUP_HOURS} hours",),
+        (ACTIVE_CLEANUP_HOURS,),
     )
     cursor.execute(
         """

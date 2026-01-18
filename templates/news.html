@@ -21,12 +21,10 @@
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
       <a href="/logout" class="nav-logout">Logout</a>
-      <span class="nav-active-users">{{ active_user_count }} people online</span>
-      <a href="/profile" class="nav-user">{{ nav_user_label }}</a>
+      <a href="/profile" class="nav-user">{{ current_user.email }}</a>
       {% else %}
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
-      <span class="nav-active-users">{{ active_user_count }} people online</span>
       <a href="/login" class="nav-login">Login</a>
       {% endif %}
     </nav>
@@ -58,6 +56,9 @@
 <div class="news-paragraph"><p>8:40 AM - I forgot to start the timer. The simulation is finding bugs, and I'm fixing them. I'll keep going with that.</p></div>
 <div class="news-paragraph"><p>9:40 AM - Taking a break.</p></div>
 <div class="news-paragraph"><p>11:45 AM - Time for a prod deploy.</p></div>
+<div class="news-paragraph"><p>1:50 PM - We are live. People are logging in and submitting roster move requests. Well, not people, technically. A person.</p></div>
+<div class="news-paragraph"><p>8:20 PM - Going to work for 45 minutes on cleaning up little bugs and fixing documentation.</p></div>
+<div class="news-paragraph"><p>9:05 PM - Adding a count of active people on the website to the home page for large screens. 45 more minutes, then I'm done for the day.</p></div>
       </section>
       <section class="rules-card">
         <h2>January 16, 2026</h2>
@@ -169,6 +170,5 @@ I'm going to put an hour into trying to write a Python program to fetch the Phil
 <div class="news-paragraph"><p>That was easy.</p></div>
       </section>
     </main>
-      <script src="/static/heartbeat.js" defer></script>
-</body>
+  </body>
 </html>
