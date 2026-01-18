@@ -53,3 +53,11 @@ Goal: show the number of people actively using the website via client-side heart
 2. Ignore rapid repeats by updating `last_seen_at` only if the previous update was older than N seconds.
 3. Cap active session rows per IP to prevent flooding.
 4. Optionally filter known bots by user-agent.
+
+## Implementation details
+- Schema: new `active_sessions` table with `session_key` (unique), `user_id` (nullable), `last_seen_at`, `user_agent`, `ip_address`.
+- Heartbeat: `/heartbeat` POST updates or inserts by `session_key` (IP + user-agent hash), and deletes rows older than 24 hours.
+- Active count: query counts rows with `last_seen_at >= now - 10 minutes`.
+- Rate limiting: `heartbeat` bucket set to 2 requests per 60 seconds per IP.
+- UI: top nav shows `{{ active_user_count }} people online` on large screens; hidden on small screens (top nav hidden).
+- Client: `static/heartbeat.js` sends a heartbeat immediately and every 60 seconds.

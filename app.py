@@ -1,5 +1,6 @@
 from collections import defaultdict, deque
 from datetime import date, datetime, timedelta
+import hashlib
 import os
 from pathlib import Path
 import subprocess
@@ -46,6 +47,7 @@ class AuthUser(UserMixin):
 @app.context_processor
 def inject_nav_user_label():
     label = ""
+    active_count = 0
     if current_user.is_authenticated:
         if current_user.team_id:
             conn = get_connection()
@@ -59,7 +61,19 @@ def inject_nav_user_label():
             label = "League Admin"
         else:
             label = current_user.email
-    return {"nav_user_label": label}
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        SELECT COUNT(*) AS count
+        FROM active_sessions
+        WHERE last_seen_at >= (CURRENT_TIMESTAMP - INTERVAL %s)
+        """,
+        (f"{ACTIVE_WINDOW_MINUTES} minutes",),
+    )
+    active_count = cursor.fetchone()["count"]
+    conn.close()
+    return {"nav_user_label": label, "active_user_count": active_count}
 
 
 @login_manager.user_loader
@@ -107,11 +121,15 @@ def admin_required(view_func):
 RATE_LIMITS = {
     "default": (120, 60),
     "audit": (30, 60),
+    "heartbeat": (2, 60),
 }
 REQUEST_HISTORY = defaultdict(deque)
 ENFORCE_HTTPS = os.getenv("FORCE_HTTPS", "").lower() in {"1", "true", "yes"}
 AUTO_BUILD_NEWS = os.getenv("AUTO_BUILD_NEWS", "").lower() in {"1", "true", "yes"}
 EASTERN_TZ = ZoneInfo("America/New_York")
+HEARTBEAT_INTERVAL_SECONDS = 60
+ACTIVE_WINDOW_MINUTES = 10
+ACTIVE_CLEANUP_HOURS = 24
 
 RULES_PATH = Path(__file__).resolve().parent / "rules.md"
 
@@ -121,6 +139,11 @@ def get_client_ip():
     if forwarded_for:
         return forwarded_for.split(",")[0].strip()
     return request.remote_addr or "unknown"
+
+
+def build_session_key(ip_address, user_agent):
+    raw = f"{ip_address}|{user_agent}".encode("utf-8")
+    return hashlib.sha256(raw).hexdigest()
 
 
 def apply_rate_limit(bucket, max_requests, window_seconds):
@@ -144,7 +167,12 @@ def enforce_https_and_rate_limit():
             return redirect(request.url.replace("http://", "https://", 1), code=301)
 
     ip = get_client_ip()
-    limit_key = "audit" if request.path == "/audit" else "default"
+    if request.path == "/audit":
+        limit_key = "audit"
+    elif request.path == "/heartbeat":
+        limit_key = "heartbeat"
+    else:
+        limit_key = "default"
     max_requests, window_seconds = RATE_LIMITS[limit_key]
     apply_rate_limit(f"{limit_key}:{ip}", max_requests, window_seconds)
     return None
@@ -174,6 +202,40 @@ def build_news_on_startup():
         print("Warning: scripts/build_news.py failed to run on startup.")
     NEWS_BUILT = True
     return None
+
+
+@app.route("/heartbeat", methods=["POST"])
+def heartbeat():
+    ip_address = get_client_ip()
+    user_agent = request.headers.get("User-Agent", "")[:512]
+    session_key = build_session_key(ip_address, user_agent)
+    user_id = current_user.id if current_user.is_authenticated else None
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        DELETE FROM active_sessions
+        WHERE last_seen_at < (CURRENT_TIMESTAMP - INTERVAL %s)
+        """,
+        (f"{ACTIVE_CLEANUP_HOURS} hours",),
+    )
+    cursor.execute(
+        """
+        INSERT INTO active_sessions (session_key, user_id, last_seen_at, user_agent, ip_address)
+        VALUES (%s, %s, CURRENT_TIMESTAMP, %s, %s)
+        ON CONFLICT (session_key)
+        DO UPDATE SET
+            user_id = EXCLUDED.user_id,
+            last_seen_at = EXCLUDED.last_seen_at,
+            user_agent = EXCLUDED.user_agent,
+            ip_address = EXCLUDED.ip_address
+        """,
+        (session_key, user_id, user_agent, ip_address),
+    )
+    conn.commit()
+    conn.close()
+    return ("", 204)
 
 
 @app.after_request

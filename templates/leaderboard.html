@@ -21,10 +21,12 @@
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
       <a href="/logout" class="nav-logout">Logout</a>
+      <span class="nav-active-users">{{ active_user_count }} people online</span>
       <a href="/profile" class="nav-user">{{ nav_user_label }}</a>
       {% else %}
       <a href="/rules" class="nav-rules">Rules</a>
       <a href="/news" class="nav-news">News</a>
+      <span class="nav-active-users">{{ active_user_count }} people online</span>
       <a href="/login" class="nav-login">Login</a>
       {% endif %}
     </nav>
@@ -98,5 +100,6 @@
     </main>
 
     <script src="/static/leaderboard.js" defer></script>
-  </body>
+      <script src="/static/heartbeat.js" defer></script>
+</body>
 </html>

@@ -57,8 +57,18 @@ a:hover {
 }
 
 .top-nav .nav-user {
-  margin-left: auto;
+  margin-left: 0;
   font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.top-nav .nav-active-users {
+  margin-left: auto;
+  font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: none;
