@@ -38,6 +38,12 @@
       <div class="hero-content">
         <h1 class="league-title league-title--small">Roster Move</h1>
         <p class="rules-intro roster-move-team">{{ team_name }}</p>
+        {% if error %}
+        <p class="auth-error">{{ error }}</p>
+        {% endif %}
+        {% if success %}
+        <p class="success-message">{{ success }}</p>
+        {% endif %}
       </div>
     </header>
 
@@ -89,13 +95,6 @@
               </div>
             </div>
           </div>
-
-          {% if error %}
-          <p class="auth-error">{{ error }}</p>
-          {% endif %}
-          {% if success %}
-          <p class="success-message">{{ success }}</p>
-          {% endif %}
 
           <button class="roster-submit" type="submit">Submit</button>
         </form>
