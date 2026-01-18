@@ -8,22 +8,26 @@ services:
       - key: TZ
         value: America/New_York
 
-cronjobs:
-  - name: nightly-roster-check
+  - type: cron
+    name: nightly-roster-check
     schedule: "30 3 * * *"
     env: python
     command: python roster-check.py
     envVars:
       - key: TZ
         value: America/New_York
-  - name: weekly-scoring
+
+  - type: cron
+    name: weekly-scoring
     schedule: "0 4 * * 0"
     env: python
     command: python scoring.py
     envVars:
       - key: TZ
         value: America/New_York
-  - name: weekly-roster-moves
+
+  - type: cron
+    name: weekly-roster-moves
     schedule: "10 4 * * 0"
     env: python
     command: python roster-moves.py
