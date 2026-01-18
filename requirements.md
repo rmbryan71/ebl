@@ -80,3 +80,6 @@ Statuses: not started, in progress, done, deferred.
 | REQ-079 | not started |  |  | Run the simulation on 2024 and other seasons. |
 | REQ-080 | not started |  |  | Handle cases where players are dropped between the auction and the start of the season. |
 | REQ-081 | not started |  | Website | Decorate player cards with icons for achievements like two-way scoring. |
+| REQ-082 | not started |  | Website | Show the number of logged-in users on large screens. |
+| REQ-083 | in progress |  | Operations | Turn off cron jobs in prod while the demo league is up. |
+| REQ-084 | To Be Verified |  | Website | Move the roster move success message to the top of the screen. |
