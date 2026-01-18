@@ -1,7 +1,6 @@
 from collections import defaultdict, deque
 from datetime import date, datetime, timedelta
 import hashlib
-import random
 import os
 from pathlib import Path
 import subprocess
@@ -76,7 +75,7 @@ def inject_nav_user_label():
     active_count = cursor.fetchone()["count"]
     conn.close()
     other_users = active_count - 1 if current_user.is_authenticated and active_count > 0 else active_count
-    display_count = other_users + random.randint(2, 4)
+    display_count = other_users + 2
     return {"nav_user_label": label, "active_user_count": display_count}
 
 
